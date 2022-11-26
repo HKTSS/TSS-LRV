@@ -52,8 +52,8 @@ namespace Plugin {
         /// <summary>Is called after loading to inform the plugin about the specifications of the train.</summary>
         public void SetVehicleSpecs(VehicleSpecs specs) {
             Plugin.specs = specs;
-            Panel[PanelIndices.FirstCarNumber] = Util.CarNumPanel(Config.carNum1);
-            Panel[PanelIndices.SecondCarNumber] = Util.CarNumPanel(Config.carNum2);
+            SetPanel(PanelIndices.FirstCarNumber, Util.CarNumPanel(Config.carNum1));
+            SetPanel(PanelIndices.SecondCarNumber, Util.CarNumPanel(Config.carNum2));
         }
 
         /// <summary>Is called when the plugin should initialize, reinitialize or jumping stations.</summary>
@@ -102,13 +102,13 @@ namespace Plugin {
             }
 
             if (DirectionLight == IndicatorLight.Left) {
-                Panel[PanelIndices.Indicator] = 1;
+                SetPanel(PanelIndices.Indicator, 1);
             } else if (DirectionLight == IndicatorLight.Right) {
-                Panel[PanelIndices.Indicator] = 2;
+                SetPanel(PanelIndices.Indicator, 2);
             } else if (DirectionLight == IndicatorLight.Both) {
-                Panel[PanelIndices.Indicator] = 3;
+                SetPanel(PanelIndices.Indicator, 3);
             } else {
-                Panel[PanelIndices.Indicator] = 0;
+                SetPanel(PanelIndices.Indicator, 0);
             }
 
             if (Config.tutorialMode) {
@@ -174,7 +174,7 @@ namespace Plugin {
                 SoundManager.Stop(SoundIndices.CabDirIndicator);
             }
 
-            Panel[PanelIndices.TrainStatus] = Config.trainStatus;
+            SetPanel(PanelIndices.TrainStatus, Config.trainStatus);
         }
 
         public void SetReverser(int reverser) {
@@ -337,7 +337,7 @@ namespace Plugin {
             }
         }
 
-        public static void setPanel(int index, int val) {
+        public static void SetPanel(int index, int val) {
             Panel[index] = val;
         }
 

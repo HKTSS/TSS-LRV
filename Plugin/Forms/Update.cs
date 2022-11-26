@@ -4,19 +4,19 @@ using System.Xml;
 
 namespace Plugin {
     public partial class Update : Form {
-        private static string downloadURL;
+        private string downloadURL;
 
         internal static void checkUpdate(string lang, Version currentVersion) {
             try {
                 XmlDocument doc = new XmlDocument();
                 doc.Load(Config.updateURL);
                 string fetchedVersion = doc.SelectSingleNode("train/version").InnerText;
-                downloadURL = doc.SelectSingleNode("train/url").InnerText;
+                string downloadURL = doc.SelectSingleNode("train/url").InnerText;
                 string releaseDate = doc.SelectSingleNode("train/release").InnerText;
                 int comparasion = currentVersion.CompareTo(Version.Parse(fetchedVersion));
 
                 if (comparasion < 0) {
-                    Update form = new Update();
+                    Update form = new Update(downloadURL);
                     form.updateLabel.Text = string.Format(Messages.getTranslation("updateForm.UpdateAvail"), fetchedVersion, releaseDate);
                     form.DLLabel.Links.Add(0, form.DLLabel.Text.Length, downloadURL);
                     form.ShowDialog();
@@ -25,7 +25,8 @@ namespace Plugin {
             }
         }
 
-        public Update() {
+        public Update(string downloadURL) {
+            this.downloadURL = downloadURL;
             InitializeComponent();
         }
 
