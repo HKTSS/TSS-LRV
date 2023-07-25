@@ -137,7 +137,7 @@ namespace Plugin {
 
                     if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 10) {
                         Panel[213] = 1;
-                        Panel[PanelIndices.HeadLight] = 1;
+                        data.HeadlightState = 1;
 
                         if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 17) {
                             Panel[PanelIndices.SpeedometerLight] = 1;
@@ -243,10 +243,6 @@ namespace Plugin {
                 case VirtualKeys.S:
                     Panel[PanelIndices.CabDoor] ^= 1;
                     break;
-                case VirtualKeys.K:
-                    Panel[PanelIndices.HeadLight] ^= 1;
-                    SoundManager.PlayCabClickSound(CameraManager.GetMode());
-                    break;
                 case VirtualKeys.J:
                     Panel[PanelIndices.LightToggle] ^= 1;
                     SoundManager.PlayCabClickSound(CameraManager.GetMode());
@@ -280,6 +276,9 @@ namespace Plugin {
                     break;
                 case VirtualKeys.MainBreaker:
                     ToggleDirLight(IndicatorLight.Both);
+                    break;
+                case VirtualKeys.Headlights:
+                    SoundManager.PlayCabClickSound(CameraManager.GetMode());
                     break;
             }
         }
@@ -372,12 +371,9 @@ namespace Plugin {
 	                    DirectionLight = IndicatorLight.Both;
                     }
                 }
+            }
 
-            }
-            /* If our current camera mode is in cab(F1), play the click sound as it should only be heard in cab. */
-            if (CameraManager.isInCab()) {
-                SoundManager.Play(SoundIndices.Click, 1.0, 1.0, false);
-            }
+            SoundManager.PlayCabClickSound(CameraManager.GetMode());
         }
 
         internal void ResetLRV(ResetType mode) {
@@ -388,7 +384,6 @@ namespace Plugin {
                 if (Crashed) {
                     Crashed = false;
                     Panel[PanelIndices.SpeedometerLight] = 0;
-                    Panel[PanelIndices.HeadLight] = 0;
                     Panel[213] = 0;
                 }
             }

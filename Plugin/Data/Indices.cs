@@ -7,7 +7,6 @@
         public const int Digit2 = 106;
         public const int Digit3 = 107;
         public const int LightToggle = 99;
-        public const int HeadLight = 109;
         public const int SpeedometerLight = 110;
         public const int CabDoor = 111;
         public const int SpeedModeSwitch = 112;
