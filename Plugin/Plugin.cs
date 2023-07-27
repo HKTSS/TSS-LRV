@@ -248,20 +248,12 @@ namespace Plugin {
                     SoundManager.PlayCabClickSound(CameraManager.GetMode());
                     break;
                 case VirtualKeys.WiperSpeedUp:
-                    if (Panel[PanelIndices.WiperMode] + 1 > 4) {
-                        Panel[PanelIndices.WiperMode] = 0;
-                    } else {
-                        Panel[PanelIndices.WiperMode]++;
-                    }
                     SoundManager.PlayCabClickSound(CameraManager.GetMode());
+                    Panel[PanelIndices.WiperMode] = Math.Min(Panel[PanelIndices.WiperMode] + 1, Enum.GetNames(typeof(WiperMode)).Length - 1);
                     break;
                 case VirtualKeys.WiperSpeedDown:
-                    if (Panel[PanelIndices.WiperMode] - 1 < 0) {
-                        Panel[PanelIndices.WiperMode] = 5;
-                    } else {
-                        Panel[PanelIndices.WiperMode]--;
-                    }
                     SoundManager.PlayCabClickSound(CameraManager.GetMode());
+                    Panel[PanelIndices.WiperMode] = Math.Max(Panel[PanelIndices.WiperMode] - 1, 0);
                     break;
                 case VirtualKeys.LeftDoors:
                     PAManager.KeyDown();
@@ -420,5 +412,11 @@ namespace Plugin {
         Normal,
         Fast,
         Slow
+    }
+
+    enum WiperMode { 
+        Stopped,
+        Normal,
+        Fast
     }
 }
