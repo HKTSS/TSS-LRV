@@ -2,28 +2,28 @@
 
 namespace Plugin {
     internal class CameraManager {
-        private CameraViewMode CameraMode;
-        public void Update(ElapseData data) {
+        private static CameraViewMode CameraMode;
+        public static void Update(ElapseData data) {
             CameraMode = data.CameraViewMode;
         }
 
-        public bool isInCab() {
+        public static bool isInCab() {
             return CameraMode == CameraViewMode.Interior || CameraMode == CameraViewMode.InteriorLookAhead;
         }
 
-        public bool isInF2() {
+        public static bool isInF2() {
             return CameraMode == CameraViewMode.Exterior;
         }
 
-        public bool isInF3() {
+        public static bool isInF3() {
             return CameraMode == CameraViewMode.Track;
         }
 
-        public bool isInF4() {
+        public static bool isInF4() {
             return CameraMode == CameraViewMode.FlyBy || CameraMode == CameraViewMode.FlyByZooming;
         }
 
-        public CameraViewMode GetMode() {
+        public static CameraViewMode GetMode() {
             return CameraMode;
         }
     }

@@ -38,7 +38,6 @@
 
     public class BeaconIndices {
         public const int SpeedLimit = 140;
-        public const int IndicatorLeft = 145;
-        public const int IndicatorRight = 146;
+        public const int AIIndicators = 145;
     }
 }

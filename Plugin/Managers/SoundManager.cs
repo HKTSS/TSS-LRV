@@ -2,8 +2,8 @@
 
 namespace Plugin {
     /// <summary>The interface to be implemented by the plugin.</summary>
-    public partial class Plugin : IRuntime {
-
+    public partial class Plugin : IRuntime
+    {
         /// <summary>Manages the playback of sounds.</summary>
         internal static class SoundManager {
             private static CarSounds[] SoundHandles;

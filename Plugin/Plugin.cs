@@ -25,9 +25,8 @@ namespace Plugin {
         private bool DoorBrake;
         private bool UpdateChecked;
         private bool Ready = false;
-        private CameraManager CameraManager = new CameraManager();
         private PAManager PAManager = new PAManager();
-        private IndicatorLight DirectionLight = IndicatorLight.None;
+        public static IndicatorLight DirectionLight = IndicatorLight.None;
 
         /// <summary>Is called when the plugin is loaded.</summary>
         public bool Load(LoadProperties prop) {
@@ -41,7 +40,7 @@ namespace Plugin {
             SoundManager.Initialise(prop.PlaySound, prop.PlayCarSound, 256);
             prop.Panel = Panel;
             prop.FailureReason = "LRV plugin failed to load, some functions will be unavailable.";
-            prop.AISupport = AISupport.Basic;
+            prop.AISupport = OpenBveApi.Runtime.AISupport.Basic;
 
             return Config.LoadConfig(prop, Util.LRVType.P4);
         }
@@ -73,6 +72,7 @@ namespace Plugin {
             CameraManager.Update(data);
             StationManager.Update(data);
             ReporterLED.Update(data);
+            AISupport.Elapse(data);
             PAManager.Loop();
 
             /* Check for update on the first frame */
@@ -219,10 +219,10 @@ namespace Plugin {
                     Panel[PanelIndices.TreadBrake] = (Panel[PanelIndices.TreadBrake] + 1) % 2;
                     break;
                 case VirtualKeys.D:
-                    ToggleDirLight(IndicatorLight.Left);
+                    ToggleDirectionIndicator(IndicatorLight.Left);
                     break;
                 case VirtualKeys.E:
-                    ToggleDirLight(IndicatorLight.Right);
+                    ToggleDirectionIndicator(IndicatorLight.Right);
                     break;
                 case VirtualKeys.F:
                     CurrentRoute++;
@@ -267,7 +267,7 @@ namespace Plugin {
                     }
                     break;
                 case VirtualKeys.MainBreaker:
-                    ToggleDirLight(IndicatorLight.Both);
+                    SetDirectionIndicator(IndicatorLight.Both);
                     break;
                 case VirtualKeys.Headlights:
                     SoundManager.PlayCabClickSound(CameraManager.GetMode());
@@ -298,71 +298,52 @@ namespace Plugin {
                 DoorBrake = false;
             }
         }
+
         public void SetSignal(SignalData[] signal) {
         }
 
         /// <summary>Is called when the train passes a beacon.</summary>
         /// <param name="beacon">The beacon data.</param>
         public void SetBeacon(BeaconData beacon) {
+            AISupport.SetBeacon(beacon);
             switch (beacon.Type) {
                 case BeaconIndices.SpeedLimit:
                     if (beacon.Optional > 0) SpeedLimit = beacon.Optional;
                     break;
-                case BeaconIndices.IndicatorLeft:
-                    if (StationManager.AIEnabled)
-                        if (beacon.Optional == 1) {
-                            if (DirectionLight != IndicatorLight.Left) KeyDown(VirtualKeys.D);
-                        } else {
-                            if (DirectionLight != IndicatorLight.None) KeyDown(VirtualKeys.D);
-                        }
-                    break;
-                case BeaconIndices.IndicatorRight:
-	                if (StationManager.AIEnabled) {
-		                if (beacon.Optional == 1 && DirectionLight != IndicatorLight.Right) {
-			                KeyDown(VirtualKeys.E);
-		                } else if (DirectionLight != IndicatorLight.None) {
-			                KeyDown(VirtualKeys.E);
-		                }
-	                }
-	                break;
             }
+        }
+
+        public void PerformAI(AIData data)
+        {
+            AISupport.PerformAI(data);
         }
 
         public static void SetPanel(int index, int val) {
             Panel[index] = val;
         }
 
-        public void PerformAI(AIData data) {
-            StationManager.ResetAITimer();
-        }
-
-        internal void ToggleDirLight(IndicatorLight direction) {
-            if (direction == IndicatorLight.Left) {
-                if (DirectionLight == direction) {
-                    DirectionLight = IndicatorLight.None;
-                } else {
-                    DirectionLight = IndicatorLight.Left;
-                }
-            } else if (direction == IndicatorLight.Right) {
-                if (DirectionLight == direction) {
-                    DirectionLight = IndicatorLight.None;
-                } else {
-                    DirectionLight = IndicatorLight.Right;
-                }
-            } else if (direction == IndicatorLight.Both) {
-                if (DirectionLight == direction) {
-                    DirectionLight = IndicatorLight.None;
-                    Panel[PanelIndices.DirBoth] = 0;
-                } else {
-                    /* Can't be used in conjunction */
-                    if (DirectionLight == IndicatorLight.Left || DirectionLight == IndicatorLight.Right) {
+        public static void ToggleDirectionIndicator(IndicatorLight direction) {
+            if(DirectionLight == direction) {
+                SetDirectionIndicator(IndicatorLight.None);
+            } else {
+                if (direction == IndicatorLight.Both) {
+                    if (DirectionLight == IndicatorLight.Left || DirectionLight == IndicatorLight.Right)
+                    {
                         MessageManager.PrintMessage(Messages.getTranslation("gameMsg.turnOffTurnSignal"), MessageColor.Orange, 5.0);
                         return;
-                    } else {
-	                    Panel[PanelIndices.DirBoth] = 1;
-	                    DirectionLight = IndicatorLight.Both;
                     }
                 }
+                SetDirectionIndicator(direction);
+            }
+        }
+
+        public static void SetDirectionIndicator(IndicatorLight direction) {
+            DirectionLight = direction;
+
+            if (direction == IndicatorLight.Both) {
+                Panel[PanelIndices.DirBoth] = 1;
+            } else {
+                Panel[PanelIndices.DirBoth] = 0;
             }
 
             SoundManager.PlayCabClickSound(CameraManager.GetMode());
@@ -379,7 +360,7 @@ namespace Plugin {
                     Panel[213] = 0;
                 }
             }
-            StationManager.AIEnabled = false;
+            AISupport.ResetLRV(mode);
             StationManager.approachingStation = false;
             iSPSDoorLock = false;
             DoorBrake = false;
@@ -396,12 +377,12 @@ namespace Plugin {
         }
     }
 
-    enum ResetType {
+    public enum ResetType {
         JumpStation,
         ManualReset,
     }
 
-    enum IndicatorLight {
+    public enum IndicatorLight {
         Left,
         Right,
         Both,
