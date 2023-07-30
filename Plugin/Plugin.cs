@@ -1,7 +1,6 @@
 ﻿using OpenBveApi.Runtime;
 using OpenBveApi.Colors;
 using System;
-using System.Threading.Tasks;
 
 namespace Plugin {
     /// <summary>The interface to be implemented by the plugin.</summary>
@@ -17,13 +16,11 @@ namespace Plugin {
         internal static string Language = "en-us";
         internal static SpeedMode CurrentSpeedMode = SpeedMode.Normal;
         internal int SpeedLimit = 60;
-        private Version Version = new Version("2.5.0");
         private int CurrentRoute = 0;
         private double currentSpeed;
         private bool Crashed;
         private bool iSPSDoorLock;
         private bool DoorBrake;
-        private bool UpdateChecked;
         private bool Ready = false;
         private PAManager PAManager = new PAManager();
         public static IndicatorLight DirectionLight = IndicatorLight.None;
@@ -74,14 +71,6 @@ namespace Plugin {
             ReporterLED.Update(data);
             AISupport.Elapse(data);
             PAManager.Loop();
-
-            /* Check for update on the first frame */
-            if (!UpdateChecked) {
-                if (!Config.ignoreUpdate) {
-                    Task.Run(() => Update.checkUpdate(Language, Version));
-                }
-                UpdateChecked = true;
-            }
 
             /* Lock the door above 2 km/h */
             if (currentSpeed > 2 && Config.doorlockEnabled) {

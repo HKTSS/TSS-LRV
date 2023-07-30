@@ -10,10 +10,8 @@ namespace Plugin {
 		private static string reporterCustomMsgFile;
 		private static string[] lines;
 		private static string failureReason;
-		internal static string updateURL = "https://hktss.github.io/LRV-P4/page/update.xml";
 		internal static int carNum1 = 1127;
 		internal static int carNum2 = 1120;
-		internal static bool ignoreUpdate;
 		internal static bool doorLockEnabled;
 		internal static bool doorApplyBrake;
 		internal static bool doorlockEnabled;
@@ -82,16 +80,9 @@ namespace Plugin {
 									if (valstr == "true") allowReversingInStations = true;
 									else allowReversingInStations = false;
 									break;
-								case "ignoreupdate":
-									if (valstr == "true") ignoreUpdate = true;
-									else ignoreUpdate = false;
-									break;
 								case "tutorial":
 									if (valstr == "true") tutorialMode = true;
 									else tutorialMode = false;
-									break;
-								case "updateurl":
-									updateURL = valstr;
 									break;
 								case "trainstatus":
 									if (int.TryParse(valstr, NumberStyles.Integer, CultureInfo.InvariantCulture, out val)) {
@@ -196,7 +187,6 @@ namespace Plugin {
 			sb.AppendLine("RevAtStation = false");
 			sb.AppendLine("TrainStatus = 0");
 			sb.AppendLine("Tutorial = true");
-			sb.AppendLine("IgnoreUpdate = false");
 			try {
 				File.WriteAllText(configFile, sb.ToString());
 				return true;
