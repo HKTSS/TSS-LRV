@@ -93,8 +93,8 @@ namespace Plugin {
 						}
 					}
 				}
-				/* TODO: Add them back */
-				return true;  //DRM.Load(prop);
+
+                return true;
 			} else {
 				/* If GenerateConfig doesn't return false, that means we have generated a config file without any error. Now we can apply the changes instantly in-game */
 				if (GenerateConfig()) {

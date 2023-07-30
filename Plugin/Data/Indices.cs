@@ -33,7 +33,7 @@
         public const int Crash = 223;
         public const int MTRBeep = 224;
         public const int StartBrake = 225;
-        public const int drvHandleClick = 226;
+        public const int powerHandleClick = 226;
     }
 
     public class BeaconIndices {

@@ -9,7 +9,7 @@ namespace Plugin {
         
         internal static bool DoorOpened;
         internal static bool DoorOpened2 = true;
-        internal static Util.LRVType LRVGeneration;
+        internal static Util.LRVType LRVGeneration = Util.LRVType.P4;
         internal static int LastBrakeNotch = 5;
         internal static bool LockTreadBrake = false;
         internal static VehicleSpecs specs;
@@ -21,14 +21,12 @@ namespace Plugin {
         private bool Crashed;
         private bool iSPSDoorLock;
         private bool DoorBrake;
-        private bool Ready = false;
+        private bool Ready;
         private PAManager PAManager = new PAManager();
         public static IndicatorLight DirectionLight = IndicatorLight.None;
 
         /// <summary>Is called when the plugin is loaded.</summary>
         public bool Load(LoadProperties prop) {
-            /* Get LRV Generation with GetLRVGen method/function in Misc.cs */
-            LRVGeneration = Util.GetLRVGen(prop.TrainFolder);
             /* Initialize MessageManager, so we can print message on the top-left screen later. */
             MessageManager.Initialise(prop.AddMessage);
             /* Initialize an empty array with 256 elements, used for Panel Indicator. */
@@ -37,9 +35,9 @@ namespace Plugin {
             SoundManager.Initialise(prop.PlaySound, prop.PlayCarSound, 256);
             prop.Panel = Panel;
             prop.FailureReason = "LRV plugin failed to load, some functions will be unavailable.";
-            prop.AISupport = OpenBveApi.Runtime.AISupport.Basic;
+            prop.AISupport = AISupport.Basic;
 
-            return Config.LoadConfig(prop, Util.LRVType.P4);
+            return Config.LoadConfig(prop, LRVGeneration);
         }
 
         public void Unload() {
@@ -64,13 +62,12 @@ namespace Plugin {
             Ready = true;
             Language = data.CurrentLanguageCode;
             currentSpeed = data.Vehicle.Speed.KilometersPerHour;
-            Panel[PanelIndices.DestinationLED] = CurrentRoute;
 
             CameraManager.Update(data);
             StationManager.Update(data);
             ReporterLED.Update(data);
-            AISupport.Elapse(data);
-            PAManager.Loop();
+            AIManager.Elapse(data);
+            PAManager.Elapse(data);
 
             /* Lock the door above 2 km/h */
             if (currentSpeed > 2 && Config.doorlockEnabled) {
@@ -80,9 +77,9 @@ namespace Plugin {
             }
 
             if (currentSpeed > SpeedLimit - 5) {
-                Panel[PanelIndices.iSPSOverSpeed] = 1;
+                SetPanel(PanelIndices.iSPSOverSpeed, 1);
             } else {
-                Panel[PanelIndices.iSPSOverSpeed] = 0;
+                SetPanel(PanelIndices.iSPSOverSpeed, 0);
             }
 
             if ((DoorBrake && Config.doorApplyBrake) || (iSPSDoorLock && Config.iSPSEnabled)) {
@@ -129,9 +126,9 @@ namespace Plugin {
                         data.HeadlightState = 1;
 
                         if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 17) {
-                            Panel[PanelIndices.SpeedometerLight] = 1;
+                            SetPanel(PanelIndices.SpeedometerLight, 1);
                             DirectionLight = IndicatorLight.None;
-                            Panel[PanelIndices.Indicator] = 0;
+                            SetPanel(PanelIndices.Indicator, 0);
                         }
                     }
                     Crashed = true;
@@ -144,7 +141,9 @@ namespace Plugin {
                 if (data.Handles.Reverser == 1) {
                     iSPSDoorLock = true;
                 } else {
-                    if(Config.allowReversingInStations) iSPSDoorLock = false;
+                    if (Config.allowReversingInStations) {
+                        iSPSDoorLock = false;
+                    }
                 }
             }
 
@@ -171,7 +170,7 @@ namespace Plugin {
 
         public void SetPower(int notch) {
             if(notch % 2 == 0 && CameraManager.isInCab() && Ready) {
-                SoundManager.Play(SoundIndices.drvHandleClick, 1.0, 1.0, false);
+                SoundManager.Play(SoundIndices.powerHandleClick, 1.0, 1.0, false);
             }
         }
 
@@ -181,7 +180,7 @@ namespace Plugin {
             }
 
             if (notch % 2 == 0 && CameraManager.isInCab() && Ready) {
-                SoundManager.Play(SoundIndices.drvHandleClick, 1.0, 1.0, false);
+                SoundManager.Play(SoundIndices.powerHandleClick, 1.0, 1.0, false);
             }
 
             LastBrakeNotch = notch;
@@ -227,21 +226,21 @@ namespace Plugin {
                     break;
                 case VirtualKeys.L:
                     Panel[PanelIndices.SpeedometerLight] ^= 1;
-                    SoundManager.PlayCabClickSound(CameraManager.GetMode());
+                    SoundManager.PlayCabPanelClickSound();
                     break;
                 case VirtualKeys.S:
                     Panel[PanelIndices.CabDoor] ^= 1;
                     break;
                 case VirtualKeys.J:
                     Panel[PanelIndices.LightToggle] ^= 1;
-                    SoundManager.PlayCabClickSound(CameraManager.GetMode());
+                    SoundManager.PlayCabPanelClickSound();
                     break;
                 case VirtualKeys.WiperSpeedUp:
-                    SoundManager.PlayCabClickSound(CameraManager.GetMode());
+                    SoundManager.PlayCabPanelClickSound();
                     Panel[PanelIndices.WiperMode] = Math.Min(Panel[PanelIndices.WiperMode] + 1, Enum.GetNames(typeof(WiperMode)).Length - 1);
                     break;
                 case VirtualKeys.WiperSpeedDown:
-                    SoundManager.PlayCabClickSound(CameraManager.GetMode());
+                    SoundManager.PlayCabPanelClickSound();
                     Panel[PanelIndices.WiperMode] = Math.Max(Panel[PanelIndices.WiperMode] - 1, 0);
                     break;
                 case VirtualKeys.LeftDoors:
@@ -259,7 +258,7 @@ namespace Plugin {
                     SetDirectionIndicator(IndicatorLight.Both);
                     break;
                 case VirtualKeys.Headlights:
-                    SoundManager.PlayCabClickSound(CameraManager.GetMode());
+                    SoundManager.PlayCabPanelClickSound();
                     break;
             }
         }
@@ -294,7 +293,7 @@ namespace Plugin {
         /// <summary>Is called when the train passes a beacon.</summary>
         /// <param name="beacon">The beacon data.</param>
         public void SetBeacon(BeaconData beacon) {
-            AISupport.SetBeacon(beacon);
+            AIManager.SetBeacon(beacon);
             switch (beacon.Type) {
                 case BeaconIndices.SpeedLimit:
                     if (beacon.Optional > 0) SpeedLimit = beacon.Optional;
@@ -302,9 +301,8 @@ namespace Plugin {
             }
         }
 
-        public void PerformAI(AIData data)
-        {
-            AISupport.PerformAI(data);
+        public void PerformAI(AIData data) {
+            AIManager.PerformAI(data);
         }
 
         public static void SetPanel(int index, int val) {
@@ -326,16 +324,26 @@ namespace Plugin {
             }
         }
 
-        public static void SetDirectionIndicator(IndicatorLight direction) {
-            DirectionLight = direction;
+        public static void SetDirectionIndicator(IndicatorLight newDirection) {
+            DirectionLight = newDirection;
 
-            if (direction == IndicatorLight.Both) {
-                Panel[PanelIndices.DirBoth] = 1;
+            if (newDirection == IndicatorLight.Both) {
+                SetPanel(PanelIndices.DirBoth, 1);
             } else {
-                Panel[PanelIndices.DirBoth] = 0;
+                SetPanel(PanelIndices.DirBoth, 0);
             }
 
-            SoundManager.PlayCabClickSound(CameraManager.GetMode());
+            if (newDirection == IndicatorLight.Left) {
+                SetPanel(PanelIndices.Indicator, 1);
+            } else if (newDirection == IndicatorLight.Right) {
+                SetPanel(PanelIndices.Indicator, 2);
+            } else if (newDirection == IndicatorLight.Both) {
+                SetPanel(PanelIndices.Indicator, 3);
+            } else {
+                SetPanel(PanelIndices.Indicator, 0);
+            }
+
+            SoundManager.PlayCabPanelClickSound();
         }
 
         internal void ResetLRV(ResetType mode) {
@@ -345,11 +353,11 @@ namespace Plugin {
                 iSPSDoorLock = false;
                 if (Crashed) {
                     Crashed = false;
-                    Panel[PanelIndices.SpeedometerLight] = 0;
+                    SetPanel(PanelIndices.SpeedometerLight, 0);
                     Panel[213] = 0;
                 }
             }
-            AISupport.ResetLRV(mode);
+            AIManager.ResetLRV(mode);
             StationManager.approachingStation = false;
             iSPSDoorLock = false;
             DoorBrake = false;

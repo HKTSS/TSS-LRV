@@ -11,6 +11,7 @@ namespace Plugin {
             if (Plugin.Language.ToLowerInvariant().StartsWith("zh")) {
                 TranslateForm();
             }
+            //this.FormClosing += onFormClosing;
         }
 
         internal void TranslateForm() {
@@ -44,11 +45,7 @@ namespace Plugin {
         }
 
         internal static void LaunchForm() {
-            if (Application.OpenForms.OfType<ConfigForm>().Any()) {
-                Application.OpenForms.OfType<ConfigForm>().First().BringToFront();
-            } else {
-                Task.Run(() => Application.Run(new ConfigForm()));
-            }
+            Task.Run(() => new ConfigForm().ShowDialog());
         }
 
         private void ConfigForm_Load(object sender, EventArgs e) {
@@ -115,9 +112,11 @@ namespace Plugin {
             Config.WriteConfig("TrainStatus", TrainStatusBox.SelectedIndex.ToString());
             Config.WriteConfig("Tutorial", tutCheckBox.Checked.ToString().ToLowerInvariant());
             this.Close();
-            this.Invalidate();
-            /* Force quit the form, as mono just freezes the form without this :/ */
-            Application.Exit();
         }
-	}
+
+        private void onFormClosing(object sender, FormClosingEventArgs args) {
+            /* Force quit the form, as mono just freezes the form without this :/ */
+            //Application.Exit();
+        }
+    }
 }

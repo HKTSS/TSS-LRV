@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Plugin {
+﻿namespace Plugin {
 	static class Util {
 		internal static int CarNumPanel(int carNum) {
 			/* The plugin states is just Car No. - 1110 */
@@ -17,25 +15,6 @@ namespace Plugin {
 			P1R,
 			P1,
 			Invalid,
-		}
-
-		internal static LRVType GetLRVGen(string trainFolderPath) {
-			var P4 = Path.Combine(trainFolderPath, "P4_1");
-			var P3 = Path.Combine(trainFolderPath, "1106");
-			var P1R = Path.Combine(trainFolderPath, "P1_1");
-			if (Directory.Exists(P4)) {
-				return LRVType.P4;
-			}
-
-			if (Directory.Exists(P3)) {
-				return LRVType.P3;
-			}
-			
-			if (Directory.Exists(P1R)) {
-				return LRVType.P1R;
-			} else {
-				return LRVType.Invalid;
-			}
 		}
 
 		/* This method are called for each car, which validates the car number depending on what phase the train is. This will also reset to the default value if the car number is invalid */

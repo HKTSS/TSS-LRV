@@ -67,7 +67,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
-    <Compile Include="AISupport.cs" />
+    <Compile Include="Managers\AIManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenBveApi">

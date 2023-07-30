@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Plugin {
     /// <summary>The interface to be implemented by the plugin.</summary>
-    public class AISupport {
+    public class AIManager {
         private const int AI_TIMEOUT = 4;
         private static IndicatorLight Indicator = IndicatorLight.None;
         private static bool AIEnabled;

@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using OpenBveApi.Runtime;
 using static Plugin.Plugin;
 
 namespace Plugin {
     /// <summary>The interface to be implemented by the plugin.</summary>
     public class PAManager {
 
-        internal List<int> QueuedPA = new List<int>();
-        internal int PlayingPA;
+        private static List<int> QueuedPA = new List<int>();
+        private static int PlayingPA;
 
         /// <summary>Is called when the plugin should initialize, reinitialize or jumping stations.</summary>
         public void Load() {
@@ -17,7 +18,7 @@ namespace Plugin {
         }
 
         /// <summary>This is called every frame. If you have 60fps, then this method is called 60 times in 1 second</summary>
-        public void Loop() {
+        public void Elapse(ElapseData data) {
             if (!SoundManager.IsPlaying(PlayingPA) && QueuedPA.Count > 0) {
                 SoundManager.PlayAllCar(QueuedPA[0], 1.0, 1.0, false);
                 PlayingPA = QueuedPA[0];

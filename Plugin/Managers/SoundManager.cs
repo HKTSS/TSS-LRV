@@ -58,9 +58,10 @@ namespace Plugin {
 	            SoundHandles[0].LastPitch[soundIndex] = pitch;
             }
 
-            internal static void PlayCabClickSound(CameraViewMode cameraMode) {
-                if (cameraMode != CameraViewMode.Interior && cameraMode != CameraViewMode.InteriorLookAhead) return;
-                Play(SoundIndices.Click, 1.0, 1.0, false);
+            internal static void PlayCabPanelClickSound() {
+                if (CameraManager.isInCab()) {
+                    Play(SoundIndices.Click, 1.0, 1.0, false);
+                }
             }
 
             internal static void PlayAllCar(int soundIndex, double volume, double pitch, bool loop) {
