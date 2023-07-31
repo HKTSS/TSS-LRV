@@ -223,12 +223,12 @@ namespace Plugin {
                 case VirtualKeys.I:
                     Panel[PanelIndices.Digit3]++;
                     break;
+                case VirtualKeys.K:
+                    Panel[PanelIndices.CabDoor] ^= 1;
+                    break;
                 case VirtualKeys.L:
                     Panel[PanelIndices.SpeedometerLight] ^= 1;
                     SoundManager.PlayCabPanelClickSound();
-                    break;
-                case VirtualKeys.S:
-                    Panel[PanelIndices.CabDoor] ^= 1;
                     break;
                 case VirtualKeys.J:
                     Panel[PanelIndices.LightToggle] ^= 1;
