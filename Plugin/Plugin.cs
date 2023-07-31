@@ -16,7 +16,6 @@ namespace Plugin {
         internal static string Language = "en-us";
         internal static SpeedMode CurrentSpeedMode = SpeedMode.Normal;
         internal int SpeedLimit = 60;
-        private int CurrentRoute = 0;
         private double currentSpeed;
         private bool Crashed;
         private bool iSPSDoorLock;
@@ -213,7 +212,7 @@ namespace Plugin {
                     ToggleDirectionIndicator(IndicatorLight.Right);
                     break;
                 case VirtualKeys.F:
-                    CurrentRoute++;
+                    SetPanel(PanelIndices.DestinationLED, Panel[PanelIndices.DestinationLED]+1);
                     break;
                 case VirtualKeys.G:
                     Panel[PanelIndices.Digit1]++;
