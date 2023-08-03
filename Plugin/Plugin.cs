@@ -254,7 +254,7 @@ namespace Plugin {
                     }
                     break;
                 case VirtualKeys.MainBreaker:
-                    SetDirectionIndicator(IndicatorLight.Both);
+                    ToggleDirectionIndicator(IndicatorLight.Both);
                     break;
                 case VirtualKeys.Headlights:
                     SoundManager.PlayCabPanelClickSound();
