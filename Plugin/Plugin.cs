@@ -122,7 +122,14 @@ namespace Plugin {
 
                     if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 10) {
                         Panel[213] = 1;
-                        data.HeadlightState = 1;
+                        try {
+                            //HACK: Use reflection to call data.HeadlightState = 2
+                            //This is required or our plugin will throw an error in older OpenBVE Version
+                            //Because you know there will always be someone running this in older version despite being warned against so...
+                            typeof(ElapseData).GetField("HeadlightState").SetValue(data, 2);
+                        } catch (System.Reflection.TargetException) {
+
+                        }
 
                         if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 17) {
                             SetPanel(PanelIndices.SpeedometerLight, 1);
