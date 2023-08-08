@@ -7,7 +7,6 @@ namespace Plugin {
     /// <summary>The interface to be implemented by the plugin.</summary>
     public partial class Plugin : IRuntime {
         private double currentSpeed;
-        private bool Crashed;
         private bool iSPSDoorLock;
         private bool DoorBrake;
         private bool Ready;
@@ -16,11 +15,12 @@ namespace Plugin {
         internal static bool DoorOpened2 = true;
         internal static Util.LRVType LRVGeneration = Util.LRVType.P4;
         internal static int LastBrakeNotch = 5;
-        internal static bool LockTreadBrake = false;
+        internal static bool LockTreadBrake;
         internal static VehicleSpecs specs;
         internal static string Language = "en-us";
         internal static SpeedMode CurrentSpeedMode = SpeedMode.Normal;
         internal static IndicatorLight DirectionLight = IndicatorLight.None;
+        internal static CrashState currentCrashState = CrashState.None;
         internal static int SpeedLimit = 60;
 
         /// <summary>Is called when the plugin is loaded.</summary>
@@ -45,13 +45,13 @@ namespace Plugin {
         /// <summary>Is called after loading to inform the plugin about the specifications of the train.</summary>
         public void SetVehicleSpecs(VehicleSpecs specs) {
             Plugin.specs = specs;
-            PanelManager.Set(PanelIndices.FirstCarNumber, Util.CarNumPanel(Config.carNum1));
-            PanelManager.Set(PanelIndices.SecondCarNumber, Util.CarNumPanel(Config.carNum2));
         }
 
         /// <summary>Is called when the plugin should initialize, reinitialize or jumping stations.</summary>
         public void Initialize(InitializationModes mode) {
             PAManager.Initialize();
+            PanelManager.Set(PanelIndices.FirstCarNumber, Util.CarNumPanel(Config.carNum1));
+            PanelManager.Set(PanelIndices.SecondCarNumber, Util.CarNumPanel(Config.carNum2));
             ResetLRV(ResetType.JumpStation);
         }
 
@@ -115,27 +115,33 @@ namespace Plugin {
                 data.Handles.PowerNotch = specs.PowerNotches - 1;
             }
 
-            if (data.PrecedingVehicle != null) {
-                if (Config.crashEnabled && Crashed == false && data.PrecedingVehicle.Distance < 0.1 && data.PrecedingVehicle.Distance > -4) {
+            switch(currentCrashState) {
+                case CrashState.Medium:
+                    PanelManager.Set(PanelIndices.GlassCracked, 1);
+                    SetHeadlightState(data, 2);
+                    break;
+                case CrashState.Severe:
+                    PanelManager.Set(PanelIndices.GlassCracked, 1);
+                    PanelManager.Set(PanelIndices.NoPower, 1);
+                    DirectionLight = IndicatorLight.None;
+                    PanelManager.Set(PanelIndices.Indicator, 0);
+                    break;
+            }
+
+            // Handle collision with front train
+            if (data.PrecedingVehicle != null && Config.crashEnabled) {
+                if (currentCrashState == CrashState.None && data.PrecedingVehicle.Distance < 0.1 && data.PrecedingVehicle.Distance > -4) {
                     /* Crash Sounds */
                     SoundManager.Play(SoundIndices.Crash, 1.0, 1.0, false);
+                    double collisionSpeed = Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed);
 
-                    if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 10) {
-                        //HACK: Use reflection to call data.HeadlightState = 2
-                        //This is required or our plugin will throw an error in older OpenBVE Version
-                        //Because you know there will always be someone running this in older version despite being warned against so...
-
-                        if(setHeadLightMethod != null) {
-                            setHeadLightMethod.Invoke(data, new object[] { 2 });
-                        }
-
-                        if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 17) {
-                            PanelManager.Set(PanelIndices.SpeedometerLight, 1);
-                            DirectionLight = IndicatorLight.None;
-                            PanelManager.Set(PanelIndices.Indicator, 0);
-                        }
+                    if(collisionSpeed > 17) {
+                        currentCrashState = CrashState.Severe;
+                    } else if(collisionSpeed > 10) {
+                        currentCrashState = CrashState.Medium;
+                    } else {
+                        currentCrashState = CrashState.Minor;
                     }
-                    Crashed = true;
                 }
             }
 
@@ -167,6 +173,16 @@ namespace Plugin {
             }
 
             PanelManager.Set(PanelIndices.TrainStatus, Config.trainStatus);
+        }
+
+        private void SetHeadlightState(ElapseData data, int state) {
+            //HACK: Use reflection to call data.HeadlightState = 2
+            //This is required or our plugin will throw an error in older OpenBVE Version
+            //Because you know there will always be someone running this in older version despite being warned against so...
+            if (setHeadLightMethod != null)
+            {
+                setHeadLightMethod.Invoke(data, new object[] { 2 });
+            }
         }
 
         public void SetReverser(int reverser) {
@@ -359,12 +375,14 @@ namespace Plugin {
                 DoorOpened2 = true;
                 DoorBrake = true;
                 iSPSDoorLock = false;
-                if (Crashed) {
-                    Crashed = false;
+                if (currentCrashState != CrashState.None) {
+                    currentCrashState = CrashState.None;
+                    PanelManager.Set(PanelIndices.GlassCracked, 0);
                     PanelManager.Set(PanelIndices.SpeedometerLight, 0);
                     PanelManager.Set(PanelIndices.NoPower, 0);
                 }
             }
+
             AIManager.ResetLRV(mode);
             StationManager.approachingStation = false;
             iSPSDoorLock = false;
@@ -404,5 +422,12 @@ namespace Plugin {
         Stopped,
         Normal,
         Fast
+    }
+
+    public enum CrashState {
+        None,
+        Minor,
+        Medium,
+        Severe
     }
 }

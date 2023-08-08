@@ -27,6 +27,7 @@
         public const int SecondCarNumber = 206;
         public const int iSPSOverSpeed = 201;
         public const int DoorLockBlink = 202;
+        public const int GlassCracked = 212;
         public const int NoPower = 213;
     }
     public class SoundIndices {
