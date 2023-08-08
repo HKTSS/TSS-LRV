@@ -22,6 +22,7 @@ namespace Plugin {
         private bool DoorBrake;
         private bool Ready;
         private PAManager PAManager = new PAManager();
+        private System.Reflection.MethodInfo setHeadLightMethod = typeof(ElapseData).GetMethod("set_HeadlightState");
         public static IndicatorLight DirectionLight = IndicatorLight.None;
 
         /// <summary>Is called when the plugin is loaded.</summary>
@@ -122,13 +123,12 @@ namespace Plugin {
 
                     if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 10) {
                         Panel[213] = 1;
-                        try {
-                            //HACK: Use reflection to call data.HeadlightState = 2
-                            //This is required or our plugin will throw an error in older OpenBVE Version
-                            //Because you know there will always be someone running this in older version despite being warned against so...
-                            typeof(ElapseData).GetField("HeadlightState").SetValue(data, 2);
-                        } catch (System.Reflection.TargetException) {
+                        //HACK: Use reflection to call data.HeadlightState = 2
+                        //This is required or our plugin will throw an error in older OpenBVE Version
+                        //Because you know there will always be someone running this in older version despite being warned against so...
 
+                        if(setHeadLightMethod != null) {
+                            setHeadLightMethod.Invoke(data, new object[] { 2 });
                         }
 
                         if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 17) {
