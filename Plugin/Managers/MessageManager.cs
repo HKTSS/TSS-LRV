@@ -1,12 +1,12 @@
 ﻿using OpenBveApi.Colors;
 using OpenBveApi.Runtime;
 
-namespace Plugin
+namespace Plugin.Managers
 {
     internal static class MessageManager
     {
         private static AddInterfaceMessageDelegate AddMessage;
-        internal static void Initialise(AddInterfaceMessageDelegate addMessage)
+        internal static void Initialize(AddInterfaceMessageDelegate addMessage)
         {
             AddMessage = addMessage;
         }

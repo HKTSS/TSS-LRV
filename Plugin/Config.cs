@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using OpenBveApi.Runtime;
+using Plugin.Managers;
 using System.Globalization;
 using System.Text;
-using System.Collections.Generic;
 
 namespace Plugin {
 	internal class Config {

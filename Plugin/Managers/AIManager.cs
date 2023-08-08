@@ -1,9 +1,6 @@
 ﻿using OpenBveApi.Runtime;
-using OpenBveApi.Colors;
-using System;
-using System.Threading.Tasks;
 
-namespace Plugin {
+namespace Plugin.Managers {
     /// <summary>The interface to be implemented by the plugin.</summary>
     public class AIManager {
         private const int AI_TIMEOUT = 4;
@@ -13,12 +10,12 @@ namespace Plugin {
         private static double currentTime;
 
         /// <summary>Is called when the plugin should initialize, reinitialize or jumping stations.</summary>
-        public static void ResetLRV(ResetType type) {
+        internal static void ResetLRV(ResetType type) {
             AIEnabled = false;
         }
 
         /// <summary>This is called every frame. If you have 60fps, then this method is called 60 times in 1 second</summary>
-        public static void Elapse(ElapseData data) {
+        internal static void Elapse(ElapseData data) {
             currentTime = data.TotalTime.Seconds;
 
             // We can't track if AI is enabled, so we have to cheat by counting down if AI didn't perform anything
@@ -34,16 +31,16 @@ namespace Plugin {
         }
 
         /// <summary>Is called when a virtual key is pressed.</summary>
-        public static void KeyDown(VirtualKeys key) {
+        internal static void KeyDown(VirtualKeys key) {
         }
 
         /// <summary>Is called when a virtual key is released.</summary>
-        public static void KeyUp(VirtualKeys key) {
+        internal static void KeyUp(VirtualKeys key) {
         }
 
         /// <summary>Is called when the train passes a beacon.</summary>
         /// <param name="beacon">The beacon data.</param>
-        public static void SetBeacon(BeaconData beacon) {
+        internal static void SetBeacon(BeaconData beacon) {
             switch (beacon.Type) {
                 case BeaconIndices.AIIndicators:
                     switch(beacon.Optional) {
@@ -65,11 +62,11 @@ namespace Plugin {
         }
 
         // Called by OpenBVE when AI is performed
-        public static void PerformAI(AIData data) {
+        internal static void PerformAI(AIData data) {
             ResetAITimer();
         }
 
-        private static void ResetAITimer() {
+        internal static void ResetAITimer() {
             lastAICall = currentTime;
             AIEnabled = true;
         }

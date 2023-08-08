@@ -1,4 +1,5 @@
 ﻿using OpenBveApi.Runtime;
+using Plugin.Managers;
 using System;
 using System.Collections.Generic;
 
@@ -72,21 +73,21 @@ namespace Plugin {
 			textureShiftX = Math.Min(nextTextureShiftX, clampedX);
 
 			/* If the door has opened in a station, tell the reporter to hide the LED when the current state finished displaying. */
-			if (StationManager.doorOpenedInAStation) {
+			if (StationManager.doorOpenedInStation) {
 				reporterWillBeHidden = true;
 			}
 
 			/* Output the pluginstate to display nothing if the reporter is hidden */
 			if (reporterHidden) {
-				Plugin.Panel[PanelIndices.ReporterLEDSpecialState] = 0;
-				Plugin.Panel[PanelIndices.ReporterLEDState] = 2;
-			} else {
-				Plugin.Panel[PanelIndices.ReporterLEDSpecialState] = showingSpecialMessage || !reporterHidden ? currentMessages.states : 0;
-				Plugin.Panel[PanelIndices.ReporterLEDState] = (int)currentState;
+                PanelManager.Set(PanelIndices.ReporterLEDSpecialState, 0);
+                PanelManager.Set(PanelIndices.ReporterLEDState, 2);
+            } else {
+                PanelManager.Set(PanelIndices.ReporterLEDSpecialState, showingSpecialMessage || !reporterHidden ? currentMessages.states : 0);
+                PanelManager.Set(PanelIndices.ReporterLEDState, (int)currentState);
 			}
 
-			Plugin.Panel[PanelIndices.ReporterLEDTextureX] = textureShiftX;
-			Plugin.Panel[PanelIndices.ReporterLEDTextureY] = textureShiftY;
+            PanelManager.Set(PanelIndices.ReporterLEDTextureX, textureShiftX);
+            PanelManager.Set(PanelIndices.ReporterLEDTextureY, textureShiftY);
 		}
 
 		private static void CycleStates() {

@@ -1,29 +1,29 @@
 ﻿using OpenBveApi.Runtime;
 
-namespace Plugin {
+namespace Plugin.Managers {
     internal class CameraManager {
         private static CameraViewMode CameraMode;
-        public static void Update(ElapseData data) {
+        internal static void Update(ElapseData data) {
             CameraMode = data.CameraViewMode;
         }
 
-        public static bool isInCab() {
+        internal static bool InCab() {
             return CameraMode == CameraViewMode.Interior || CameraMode == CameraViewMode.InteriorLookAhead;
         }
 
-        public static bool isInF2() {
+        internal static bool InF2() {
             return CameraMode == CameraViewMode.Exterior;
         }
 
-        public static bool isInF3() {
+        internal static bool InF3() {
             return CameraMode == CameraViewMode.Track;
         }
 
-        public static bool isInF4() {
+        internal static bool InF4() {
             return CameraMode == CameraViewMode.FlyBy || CameraMode == CameraViewMode.FlyByZooming;
         }
 
-        public static CameraViewMode GetMode() {
+        internal static CameraViewMode GetMode() {
             return CameraMode;
         }
     }

@@ -68,6 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Managers\AIManager.cs" />
+    <Compile Include="Managers\PanelManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenBveApi">

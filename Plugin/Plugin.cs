@@ -1,12 +1,17 @@
 ﻿using OpenBveApi.Runtime;
 using OpenBveApi.Colors;
+using Plugin.Managers;
 using System;
 
 namespace Plugin {
     /// <summary>The interface to be implemented by the plugin.</summary>
     public partial class Plugin : IRuntime {
-        internal static int[] Panel = null;
-        
+        private double currentSpeed;
+        private bool Crashed;
+        private bool iSPSDoorLock;
+        private bool DoorBrake;
+        private bool Ready;
+        private System.Reflection.MethodInfo setHeadLightMethod = typeof(ElapseData).GetMethod("set_HeadlightState");
         internal static bool DoorOpened;
         internal static bool DoorOpened2 = true;
         internal static Util.LRVType LRVGeneration = Util.LRVType.P4;
@@ -15,24 +20,18 @@ namespace Plugin {
         internal static VehicleSpecs specs;
         internal static string Language = "en-us";
         internal static SpeedMode CurrentSpeedMode = SpeedMode.Normal;
-        internal int SpeedLimit = 60;
-        private double currentSpeed;
-        private bool Crashed;
-        private bool iSPSDoorLock;
-        private bool DoorBrake;
-        private bool Ready;
-        private PAManager PAManager = new PAManager();
-        private System.Reflection.MethodInfo setHeadLightMethod = typeof(ElapseData).GetMethod("set_HeadlightState");
-        public static IndicatorLight DirectionLight = IndicatorLight.None;
+        internal static IndicatorLight DirectionLight = IndicatorLight.None;
+        internal static int SpeedLimit = 60;
 
         /// <summary>Is called when the plugin is loaded.</summary>
         public bool Load(LoadProperties prop) {
             /* Initialize MessageManager, so we can print message on the top-left screen later. */
-            MessageManager.Initialise(prop.AddMessage);
+            MessageManager.Initialize(prop.AddMessage);
             /* Initialize an empty array with 256 elements, used for Panel Indicator. */
-            Panel = new int[256];
             /* Initialize Sound, used to play sound later on. */
-            SoundManager.Initialise(prop.PlaySound, prop.PlayCarSound, 256);
+            SoundManager.Initialize(prop.PlaySound, prop.PlayCarSound, 256);
+            int[] Panel = new int[256];
+            PanelManager.Initialize(Panel);
             prop.Panel = Panel;
             prop.FailureReason = "LRV plugin failed to load, some functions will be unavailable.";
             prop.AISupport = AISupport.Basic;
@@ -46,13 +45,13 @@ namespace Plugin {
         /// <summary>Is called after loading to inform the plugin about the specifications of the train.</summary>
         public void SetVehicleSpecs(VehicleSpecs specs) {
             Plugin.specs = specs;
-            SetPanel(PanelIndices.FirstCarNumber, Util.CarNumPanel(Config.carNum1));
-            SetPanel(PanelIndices.SecondCarNumber, Util.CarNumPanel(Config.carNum2));
+            PanelManager.Set(PanelIndices.FirstCarNumber, Util.CarNumPanel(Config.carNum1));
+            PanelManager.Set(PanelIndices.SecondCarNumber, Util.CarNumPanel(Config.carNum2));
         }
 
         /// <summary>Is called when the plugin should initialize, reinitialize or jumping stations.</summary>
         public void Initialize(InitializationModes mode) {
-            PAManager.Load();
+            PAManager.Initialize();
             ResetLRV(ResetType.JumpStation);
         }
 
@@ -77,9 +76,9 @@ namespace Plugin {
             }
 
             if (currentSpeed > SpeedLimit - 5) {
-                SetPanel(PanelIndices.iSPSOverSpeed, 1);
+                PanelManager.Set(PanelIndices.iSPSOverSpeed, 1);
             } else {
-                SetPanel(PanelIndices.iSPSOverSpeed, 0);
+                PanelManager.Set(PanelIndices.iSPSOverSpeed, 0);
             }
 
             if ((DoorBrake && Config.doorApplyBrake) || (iSPSDoorLock && Config.iSPSEnabled)) {
@@ -88,24 +87,24 @@ namespace Plugin {
             }
 
             if (DirectionLight == IndicatorLight.Left) {
-                SetPanel(PanelIndices.Indicator, 1);
+                PanelManager.Set(PanelIndices.Indicator, 1);
             } else if (DirectionLight == IndicatorLight.Right) {
-                SetPanel(PanelIndices.Indicator, 2);
+                PanelManager.Set(PanelIndices.Indicator, 2);
             } else if (DirectionLight == IndicatorLight.Both) {
-                SetPanel(PanelIndices.Indicator, 3);
+                PanelManager.Set(PanelIndices.Indicator, 3);
             } else {
-                SetPanel(PanelIndices.Indicator, 0);
+                PanelManager.Set(PanelIndices.Indicator, 0);
             }
 
             if (Config.tutorialMode) {
                 if (Language.StartsWith("zh")) {
-                    Panel[PanelIndices.TutorialModeChin] = 1;
+                    PanelManager.Set(PanelIndices.TutorialModeChin, 1);
                 } else {
-                    Panel[PanelIndices.TutorialModeEng] = 1;
+                    PanelManager.Set(PanelIndices.TutorialModeEng, 1);
                 }
             } else {
-                Panel[PanelIndices.TutorialModeChin] = 0;
-                Panel[PanelIndices.TutorialModeEng] = 0;
+                PanelManager.Set(PanelIndices.TutorialModeChin, 0);
+                PanelManager.Set(PanelIndices.TutorialModeEng, 0);
             }
 
             /* Clamp the power notch to P1 on slow mode. */
@@ -122,7 +121,6 @@ namespace Plugin {
                     SoundManager.Play(SoundIndices.Crash, 1.0, 1.0, false);
 
                     if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 10) {
-                        Panel[213] = 1;
                         //HACK: Use reflection to call data.HeadlightState = 2
                         //This is required or our plugin will throw an error in older OpenBVE Version
                         //Because you know there will always be someone running this in older version despite being warned against so...
@@ -132,9 +130,9 @@ namespace Plugin {
                         }
 
                         if (Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed) > 17) {
-                            SetPanel(PanelIndices.SpeedometerLight, 1);
+                            PanelManager.Set(PanelIndices.SpeedometerLight, 1);
                             DirectionLight = IndicatorLight.None;
-                            SetPanel(PanelIndices.Indicator, 0);
+                            PanelManager.Set(PanelIndices.Indicator, 0);
                         }
                     }
                     Crashed = true;
@@ -142,7 +140,7 @@ namespace Plugin {
             }
 
             if (StationManager.approachingStation && currentSpeed < 0.1 && DoorOpened2 == false) {
-                Panel[202] = 1;
+                PanelManager.Set(PanelIndices.DoorLockBlink, 1);
                 /* If the reverser is Forward */
                 if (data.Handles.Reverser == 1) {
                     iSPSDoorLock = true;
@@ -153,13 +151,13 @@ namespace Plugin {
                 }
             }
 
-            if (currentSpeed > 10 && Panel[202] == 1) {
-                Panel[202] = 0;
+            if (currentSpeed > 10 && PanelManager.Get(PanelIndices.DoorLockBlink) == 1) {
+                PanelManager.Set(PanelIndices.DoorLockBlink, 0);
             }
 
             /* Turn signal sound in cab */
             if (DirectionLight != IndicatorLight.None) {
-                if (CameraManager.isInCab()) {
+                if (CameraManager.InCab()) {
                     SoundManager.Play(SoundIndices.CabDirIndicator, 1.0, 1.0, true);
                 } else {
                     SoundManager.Stop(SoundIndices.CabDirIndicator);
@@ -168,14 +166,14 @@ namespace Plugin {
                 SoundManager.Stop(SoundIndices.CabDirIndicator);
             }
 
-            SetPanel(PanelIndices.TrainStatus, Config.trainStatus);
+            PanelManager.Set(PanelIndices.TrainStatus, Config.trainStatus);
         }
 
         public void SetReverser(int reverser) {
         }
 
         public void SetPower(int notch) {
-            if(notch % 2 == 0 && CameraManager.isInCab() && Ready) {
+            if(notch % 2 == 0 && CameraManager.InCab() && Ready) {
                 SoundManager.Play(SoundIndices.powerHandleClick, 1.0, 1.0, false);
             }
         }
@@ -185,7 +183,7 @@ namespace Plugin {
                 SoundManager.PlayAllCar(SoundIndices.StartBrake, 1.0, 1.0, false);
             }
 
-            if (notch % 2 == 0 && CameraManager.isInCab() && Ready) {
+            if (notch % 2 == 0 && CameraManager.InCab() && Ready) {
                 SoundManager.Play(SoundIndices.powerHandleClick, 1.0, 1.0, false);
             }
 
@@ -205,12 +203,18 @@ namespace Plugin {
                     ResetLRV(0);
                     break;
                 case VirtualKeys.A2:
-                    if (CameraManager.isInCab()) SoundManager.Play(SoundIndices.Click, 1.0, 1.0, false);
-                    if ((int)CurrentSpeedMode == 2) CurrentSpeedMode = SpeedMode.Normal;
-                    else CurrentSpeedMode++; Panel[PanelIndices.SpeedModeSwitch] = (int)CurrentSpeedMode;
+                    if (CameraManager.InCab()) SoundManager.Play(SoundIndices.Click, 1.0, 1.0, false);
+
+                    if ((int)CurrentSpeedMode == 2) {
+                        CurrentSpeedMode = SpeedMode.Normal;
+                    } else {
+                        CurrentSpeedMode++;
+                    }
+
+                    PanelManager.Set(PanelIndices.SpeedModeSwitch, (int)CurrentSpeedMode);
                     break;
                 case VirtualKeys.B1:
-                    Panel[PanelIndices.TreadBrake] = (Panel[PanelIndices.TreadBrake] + 1) % 2;
+                    PanelManager.Set(PanelIndices.TreadBrake, (PanelManager.Get(PanelIndices.TreadBrake) + 1) % 2);
                     break;
                 case VirtualKeys.D:
                     ToggleDirectionIndicator(IndicatorLight.Left);
@@ -219,35 +223,35 @@ namespace Plugin {
                     ToggleDirectionIndicator(IndicatorLight.Right);
                     break;
                 case VirtualKeys.F:
-                    SetPanel(PanelIndices.DestinationLED, Panel[PanelIndices.DestinationLED]+1);
+                    PanelManager.Increment(PanelIndices.DestinationLED);
                     break;
                 case VirtualKeys.G:
-                    Panel[PanelIndices.Digit1]++;
+                    PanelManager.Increment(PanelIndices.Digit1);
                     break;
                 case VirtualKeys.H:
-                    Panel[PanelIndices.Digit2]++;
+                    PanelManager.Increment(PanelIndices.Digit2);
                     break;
                 case VirtualKeys.I:
-                    Panel[PanelIndices.Digit3]++;
+                    PanelManager.Increment(PanelIndices.Digit3);
                     break;
                 case VirtualKeys.K:
-                    Panel[PanelIndices.CabDoor] ^= 1;
+                    PanelManager.Toggle(PanelIndices.CabDoor);
                     break;
                 case VirtualKeys.L:
-                    Panel[PanelIndices.SpeedometerLight] ^= 1;
+                    PanelManager.Toggle(PanelIndices.SpeedometerLight);
                     SoundManager.PlayCabPanelClickSound();
                     break;
                 case VirtualKeys.J:
-                    Panel[PanelIndices.LightToggle] ^= 1;
+                    PanelManager.Toggle(PanelIndices.LightToggle);
                     SoundManager.PlayCabPanelClickSound();
                     break;
                 case VirtualKeys.WiperSpeedUp:
                     SoundManager.PlayCabPanelClickSound();
-                    Panel[PanelIndices.WiperMode] = Math.Min(Panel[PanelIndices.WiperMode] + 1, Enum.GetNames(typeof(WiperMode)).Length - 1);
+                    PanelManager.Increment(PanelIndices.WiperMode, Enum.GetNames(typeof(WiperMode)).Length - 1);
                     break;
                 case VirtualKeys.WiperSpeedDown:
                     SoundManager.PlayCabPanelClickSound();
-                    Panel[PanelIndices.WiperMode] = Math.Max(Panel[PanelIndices.WiperMode] - 1, 0);
+                    PanelManager.Decrement(PanelIndices.WiperMode, 0);
                     break;
                 case VirtualKeys.LeftDoors:
                     PAManager.KeyDown();
@@ -286,7 +290,7 @@ namespace Plugin {
                 /* Door is closed */
             } else if (oldState != DoorStates.None & newState == DoorStates.None) {
                 DoorOpened = false;
-                Panel[204] = 0;
+                PanelManager.Set(204, 0);
                 StationManager.approachingStation = false;
                 iSPSDoorLock = false;
                 DoorBrake = false;
@@ -311,10 +315,6 @@ namespace Plugin {
             AIManager.PerformAI(data);
         }
 
-        public static void SetPanel(int index, int val) {
-            Panel[index] = val;
-        }
-
         public static void ToggleDirectionIndicator(IndicatorLight direction) {
             if(DirectionLight == direction) {
                 SetDirectionIndicator(IndicatorLight.None);
@@ -334,19 +334,21 @@ namespace Plugin {
             DirectionLight = newDirection;
 
             if (newDirection == IndicatorLight.Both) {
-                SetPanel(PanelIndices.DirBoth, 1);
+                PanelManager.Set(PanelIndices.DirBoth, 1);
             } else {
-                SetPanel(PanelIndices.DirBoth, 0);
+                PanelManager.Set(PanelIndices.DirBoth, 0);
             }
 
             if (newDirection == IndicatorLight.Left) {
-                SetPanel(PanelIndices.Indicator, 1);
-            } else if (newDirection == IndicatorLight.Right) {
-                SetPanel(PanelIndices.Indicator, 2);
-            } else if (newDirection == IndicatorLight.Both) {
-                SetPanel(PanelIndices.Indicator, 3);
+                PanelManager.Set(PanelIndices.Indicator, 1);
+            }
+            if (newDirection == IndicatorLight.Right) {
+                PanelManager.Set(PanelIndices.Indicator, 2);
+            }
+            if (newDirection == IndicatorLight.Both) {
+                PanelManager.Set(PanelIndices.Indicator, 3);
             } else {
-                SetPanel(PanelIndices.Indicator, 0);
+                PanelManager.Set(PanelIndices.Indicator, 0);
             }
 
             SoundManager.PlayCabPanelClickSound();
@@ -359,23 +361,23 @@ namespace Plugin {
                 iSPSDoorLock = false;
                 if (Crashed) {
                     Crashed = false;
-                    SetPanel(PanelIndices.SpeedometerLight, 0);
-                    Panel[213] = 0;
+                    PanelManager.Set(PanelIndices.SpeedometerLight, 0);
+                    PanelManager.Set(PanelIndices.NoPower, 0);
                 }
             }
             AIManager.ResetLRV(mode);
             StationManager.approachingStation = false;
             iSPSDoorLock = false;
             DoorBrake = false;
-            Panel[202] = 0;
-            Panel[203] = 0;
+            PanelManager.Set(202, 0);
+            PanelManager.Set(203, 0);
         }
 
         internal static void ChangeCarNumber(int car, int states) {
             if (car == 1) {
-                Panel[PanelIndices.FirstCarNumber] = states;
+                PanelManager.Set(PanelIndices.FirstCarNumber, states);
             } else {
-                Panel[PanelIndices.SecondCarNumber] = states;
+                PanelManager.Set(PanelIndices.SecondCarNumber, states);
             }
         }
     }
@@ -392,13 +394,13 @@ namespace Plugin {
         None
     }
 
-    enum SpeedMode {
+    public enum SpeedMode {
         Normal,
         Fast,
         Slow
     }
 
-    enum WiperMode { 
+    public enum WiperMode { 
         Stopped,
         Normal,
         Fast

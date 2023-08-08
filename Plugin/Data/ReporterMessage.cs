@@ -1,9 +1,9 @@
 ﻿namespace Plugin.Data {
     internal class ReporterMessage {
-        public int duration = 0;
-        public int states = 0;
-        public int maxY = 0;
-        public int incrementY = 0;
+        public int duration;
+        public int states;
+        public int maxY;
+        public int incrementY;
         public ReporterMessage() {
         }
 
