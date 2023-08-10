@@ -16,6 +16,7 @@ namespace Plugin {
 		internal static bool doorApplyBrake;
 		internal static bool doorlockEnabled;
 		internal static bool iSPSEnabled;
+        internal static bool dsdEnabled;
 		internal static bool crashEnabled;
 		internal static bool mtrBeeping;
 		internal static bool allowReversingInStations;
@@ -72,6 +73,10 @@ namespace Plugin {
 									if (valstr == "true") crashEnabled = true;
 									else crashEnabled = false;
 									break;
+                                case "dsd":
+                                    if (valstr == "true") dsdEnabled = true;
+                                    else dsdEnabled = false;
+                                    break;
 								case "mtrbeep":
 									if (valstr == "true") mtrBeeping = true;
 									else mtrBeeping = false;

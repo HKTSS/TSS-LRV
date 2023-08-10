@@ -36,6 +36,7 @@ namespace Plugin {
             this.DoorLockCheckBox = new System.Windows.Forms.CheckBox();
             this.ApplyBrakeCheckBox = new System.Windows.Forms.CheckBox();
             this.iSPSDoorLockEnabled = new System.Windows.Forms.CheckBox();
+            this.dsdCheckBox = new System.Windows.Forms.CheckBox();
             this.Line3 = new System.Windows.Forms.Label();
             this.MiscLabel = new System.Windows.Forms.Label();
             this.CrashCheckBox = new System.Windows.Forms.CheckBox();
@@ -137,7 +138,7 @@ namespace Plugin {
             // ApplyChanges
             // 
             this.ApplyChanges.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ApplyChanges.Location = new System.Drawing.Point(156, 384);
+            this.ApplyChanges.Location = new System.Drawing.Point(156, 424);
             this.ApplyChanges.Name = "ApplyChanges";
             this.ApplyChanges.Size = new System.Drawing.Size(75, 23);
             this.ApplyChanges.TabIndex = 7;
@@ -189,9 +190,19 @@ namespace Plugin {
             this.iSPSDoorLockEnabled.Name = "iSPSDoorLockEnabled";
             this.iSPSDoorLockEnabled.Size = new System.Drawing.Size(208, 31);
             this.iSPSDoorLockEnabled.TabIndex = 12;
-            this.iSPSDoorLockEnabled.Text = "Apply brake until driver opens the door when approaching a station";
-            this.iSPSDoorLockEnabled.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.iSPSDoorLockEnabled.Text = "Apply brake until driver opens the door after approaching the station";
+            this.iSPSDoorLockEnabled.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.iSPSDoorLockEnabled.UseVisualStyleBackColor = true;
+            // 
+            // dsdCheckBox
+            // 
+            this.dsdCheckBox.Location = new System.Drawing.Point(10, 354);
+            this.dsdCheckBox.Name = "dsdEnabled";
+            this.dsdCheckBox.Size = new System.Drawing.Size(200, 31);
+            this.dsdCheckBox.TabIndex = 13;
+            this.dsdCheckBox.Text = "Apply brake if DSD Key (Space) not held for 2 seconds";
+            this.dsdCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.dsdCheckBox.UseVisualStyleBackColor = true;
             // 
             // Line3
             // 
@@ -201,7 +212,7 @@ namespace Plugin {
             this.Line3.MinimumSize = new System.Drawing.Size(0, 2);
             this.Line3.Name = "Line3";
             this.Line3.Size = new System.Drawing.Size(376, 2);
-            this.Line3.TabIndex = 13;
+            this.Line3.TabIndex = 14;
             // 
             // MiscLabel
             // 
@@ -210,7 +221,7 @@ namespace Plugin {
             this.MiscLabel.Location = new System.Drawing.Point(82, 109);
             this.MiscLabel.Name = "MiscLabel";
             this.MiscLabel.Size = new System.Drawing.Size(79, 16);
-            this.MiscLabel.TabIndex = 14;
+            this.MiscLabel.TabIndex = 15;
             this.MiscLabel.Text = "Train Settings";
             this.MiscLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -220,7 +231,7 @@ namespace Plugin {
             this.CrashCheckBox.Location = new System.Drawing.Point(10, 131);
             this.CrashCheckBox.Name = "CrashCheckBox";
             this.CrashCheckBox.Size = new System.Drawing.Size(221, 17);
-            this.CrashCheckBox.TabIndex = 15;
+            this.CrashCheckBox.TabIndex = 16;
             this.CrashCheckBox.Text = "Crash effect when hitting the trains infront";
             this.CrashCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.CrashCheckBox.UseVisualStyleBackColor = true;
@@ -231,7 +242,7 @@ namespace Plugin {
             this.MTRBeeping.Location = new System.Drawing.Point(10, 157);
             this.MTRBeeping.Name = "MTRBeeping";
             this.MTRBeeping.Size = new System.Drawing.Size(169, 17);
-            this.MTRBeeping.TabIndex = 16;
+            this.MTRBeeping.TabIndex = 17;
             this.MTRBeeping.Text = "Use MTR Door Close Beeping";
             this.MTRBeeping.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.MTRBeeping.UseVisualStyleBackColor = true;
@@ -239,10 +250,10 @@ namespace Plugin {
             // RevAtStation
             // 
             this.RevAtStation.AutoSize = true;
-            this.RevAtStation.Location = new System.Drawing.Point(10, 359);
+            this.RevAtStation.Location = new System.Drawing.Point(10, 399);
             this.RevAtStation.Name = "RevAtStation";
             this.RevAtStation.Size = new System.Drawing.Size(226, 17);
-            this.RevAtStation.TabIndex = 17;
+            this.RevAtStation.TabIndex = 18;
             this.RevAtStation.Text = "Allow reversing after approaching a station";
             this.RevAtStation.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.RevAtStation.UseVisualStyleBackColor = true;
@@ -254,7 +265,7 @@ namespace Plugin {
             this.TrainStatusLabel.Location = new System.Drawing.Point(6, 208);
             this.TrainStatusLabel.Name = "TrainStatusLabel";
             this.TrainStatusLabel.Size = new System.Drawing.Size(85, 16);
-            this.TrainStatusLabel.TabIndex = 18;
+            this.TrainStatusLabel.TabIndex = 19;
             this.TrainStatusLabel.Text = "Train Status: ";
             this.TrainStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -271,7 +282,7 @@ namespace Plugin {
             this.TrainStatusBox.Location = new System.Drawing.Point(100, 207);
             this.TrainStatusBox.Name = "TrainStatusBox";
             this.TrainStatusBox.Size = new System.Drawing.Size(136, 21);
-            this.TrainStatusBox.TabIndex = 19;
+            this.TrainStatusBox.TabIndex = 20;
             // 
             // tutCheckBox
             // 
@@ -279,7 +290,7 @@ namespace Plugin {
             this.tutCheckBox.Location = new System.Drawing.Point(10, 183);
             this.tutCheckBox.Name = "tutCheckBox";
             this.tutCheckBox.Size = new System.Drawing.Size(91, 17);
-            this.tutCheckBox.TabIndex = 20;
+            this.tutCheckBox.TabIndex = 21;
             this.tutCheckBox.Text = "Tutorial Mode";
             this.tutCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.tutCheckBox.UseVisualStyleBackColor = true;
@@ -288,7 +299,7 @@ namespace Plugin {
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(243, 418);
+            this.ClientSize = new System.Drawing.Size(243, 460);
             this.Controls.Add(this.tutCheckBox);
             this.Controls.Add(this.TrainStatusBox);
             this.Controls.Add(this.TrainStatusLabel);
@@ -300,6 +311,7 @@ namespace Plugin {
             this.Controls.Add(this.MiscLabel);
             this.Controls.Add(this.Line3);
             this.Controls.Add(this.iSPSDoorLockEnabled);
+            this.Controls.Add(this.dsdCheckBox);
             this.Controls.Add(this.ApplyBrakeCheckBox);
             this.Controls.Add(this.DoorLockCheckBox);
             this.Controls.Add(this.SafetySystemLabel);
@@ -338,6 +350,7 @@ namespace Plugin {
         private System.Windows.Forms.CheckBox DoorLockCheckBox;
         private System.Windows.Forms.CheckBox ApplyBrakeCheckBox;
         private System.Windows.Forms.CheckBox iSPSDoorLockEnabled;
+        private System.Windows.Forms.CheckBox dsdCheckBox;
         private System.Windows.Forms.Label Line3;
         private System.Windows.Forms.Label MiscLabel;
         private System.Windows.Forms.CheckBox CrashCheckBox;

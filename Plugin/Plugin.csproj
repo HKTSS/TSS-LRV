@@ -48,7 +48,7 @@
     <Compile Include="Managers\CameraManager.cs" />
     <Compile Include="Data\ReporterMessage.cs" />
     <Compile Include="Managers\PAManager.cs" />
-    <Compile Include="Messages.cs" />
+    <Compile Include="Translations.cs" />
     <Compile Include="ReporterLED.cs" />
     <Compile Include="Managers\SoundManager.cs" />
     <Compile Include="Managers\StationManager.cs" />
@@ -69,6 +69,8 @@
     <Compile Include="Util.cs" />
     <Compile Include="Managers\AIManager.cs" />
     <Compile Include="Managers\PanelManager.cs" />
+    <Compile Include="Managers\DSDManager.cs" />
+    <Compile Include="Managers\CrashManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenBveApi">

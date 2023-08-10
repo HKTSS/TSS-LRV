@@ -23,15 +23,16 @@
 
         public const int DestinationLEDOverride = 130;
         public const int TrainStatus = 131;
-        public const int FirstCarNumber = 205;
-        public const int SecondCarNumber = 206;
         public const int iSPSOverSpeed = 201;
         public const int DoorLockBlink = 202;
+        public const int FirstCarNumber = 205;
+        public const int SecondCarNumber = 206;
+        public const int DSDHeld = 211;
         public const int GlassCracked = 212;
         public const int NoPower = 213;
     }
     public class SoundIndices {
-	    public const int Click = 221;
+	    public const int CabPanelSwitch = 221;
         public const int CabDirIndicator = 222;
         public const int Crash = 223;
         public const int MTRBeep = 224;

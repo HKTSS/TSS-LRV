@@ -8,10 +8,7 @@ namespace Plugin {
     public partial class ConfigForm : Form {
         public ConfigForm() {
             InitializeComponent();
-            if (Plugin.Language.ToLowerInvariant().StartsWith("zh")) {
-                TranslateForm();
-            }
-            //this.FormClosing += onFormClosing;
+            TranslateForm();
         }
 
         internal void TranslateForm() {
@@ -25,6 +22,7 @@ namespace Plugin {
                 DoorLockCheckBox.Text = Messages.getTranslation("configForm.DoorLockLabel");
                 ApplyBrakeCheckBox.Text = Messages.getTranslation("configForm.DoorApplyBrakeLabel");
                 iSPSDoorLockEnabled.Text = Messages.getTranslation("configForm.iSPSDoorLockLabel");
+                dsdCheckBox.Text = Messages.getTranslation("configForm.dsdLabel");
                 CrashCheckBox.Text = Messages.getTranslation("configForm.CrashEffectLabel");
                 MTRBeeping.Text = Messages.getTranslation("configForm.MTRBeepingLabel");
                 RevAtStation.Text = Messages.getTranslation("configForm.ReverseAtStnLabel");
@@ -52,6 +50,7 @@ namespace Plugin {
             DoorLockCheckBox.Checked = Config.doorlockEnabled;
             ApplyBrakeCheckBox.Checked = Config.doorApplyBrake;
             iSPSDoorLockEnabled.Checked = Config.iSPSEnabled;
+            dsdCheckBox.Checked = Config.dsdEnabled;
             CrashCheckBox.Checked = Config.crashEnabled;
             MTRBeeping.Checked = Config.mtrBeeping;
             RevAtStation.Checked = Config.allowReversingInStations;
@@ -94,6 +93,7 @@ namespace Plugin {
             Config.carNum1 = Convert.ToInt32(CarNum1Box.Value);
             Config.carNum2 = Convert.ToInt32(CarNum2Box.Value);
             Config.iSPSEnabled = iSPSDoorLockEnabled.Checked;
+            Config.dsdEnabled = dsdCheckBox.Checked;
             Config.doorlockEnabled = DoorLockCheckBox.Checked;
             Config.doorApplyBrake = ApplyBrakeCheckBox.Checked;
             Config.crashEnabled = CrashCheckBox.Checked;
@@ -106,17 +106,13 @@ namespace Plugin {
             Config.WriteConfig("DoorLock", DoorLockCheckBox.Checked.ToString().ToLowerInvariant());
             Config.WriteConfig("DoorBrake", ApplyBrakeCheckBox.Checked.ToString().ToLowerInvariant());
             Config.WriteConfig("iSPSdoorlock", iSPSDoorLockEnabled.Checked.ToString().ToLowerInvariant());
+            Config.WriteConfig("dsd", dsdCheckBox.Checked.ToString().ToLowerInvariant());
             Config.WriteConfig("Crash", CrashCheckBox.Checked.ToString().ToLowerInvariant());
 			Config.WriteConfig("MTRbeep", MTRBeeping.Checked.ToString().ToLowerInvariant());
             Config.WriteConfig("RevAtStation", RevAtStation.Checked.ToString().ToLowerInvariant());
             Config.WriteConfig("TrainStatus", TrainStatusBox.SelectedIndex.ToString());
             Config.WriteConfig("Tutorial", tutCheckBox.Checked.ToString().ToLowerInvariant());
             this.Close();
-        }
-
-        private void onFormClosing(object sender, FormClosingEventArgs args) {
-            /* Force quit the form, as mono just freezes the form without this :/ */
-            //Application.Exit();
         }
     }
 }

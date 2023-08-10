@@ -19,7 +19,7 @@ namespace Plugin.Managers {
             currentTime = data.TotalTime.Seconds;
 
             // We can't track if AI is enabled, so we have to cheat by counting down if AI didn't perform anything
-            if (currentTime >= lastAICall + AI_TIMEOUT) {
+            if (AIEnabled && currentTime >= lastAICall + AI_TIMEOUT) {
                 AIEnabled = false;
             }
 
@@ -32,10 +32,12 @@ namespace Plugin.Managers {
 
         /// <summary>Is called when a virtual key is pressed.</summary>
         internal static void KeyDown(VirtualKeys key) {
+            AIEnabled = false;
         }
 
         /// <summary>Is called when a virtual key is released.</summary>
         internal static void KeyUp(VirtualKeys key) {
+            AIEnabled = false;
         }
 
         /// <summary>Is called when the train passes a beacon.</summary>

@@ -57,9 +57,9 @@ namespace Plugin.Managers {
             SoundHandles[0].LastPitch[soundIndex] = pitch;
         }
 
-        internal static void PlayCabPanelClickSound() {
+        internal static void PlayCabSound(int soundIndex) {
             if (CameraManager.InCab()) {
-                Play(SoundIndices.Click, 1.0, 1.0, false);
+                Play(soundIndex, 1.0, 1.0, false);
             }
         }
 

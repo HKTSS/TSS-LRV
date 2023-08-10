@@ -10,7 +10,7 @@ namespace Plugin {
         private bool iSPSDoorLock;
         private bool DoorBrake;
         private bool Ready;
-        private System.Reflection.MethodInfo setHeadLightMethod = typeof(ElapseData).GetMethod("set_HeadlightState");
+        private static System.Reflection.MethodInfo setHeadLightMethod = typeof(ElapseData).GetMethod("set_HeadlightState");
         internal static bool DoorOpened;
         internal static bool DoorOpened2 = true;
         internal static Util.LRVType LRVGeneration = Util.LRVType.P4;
@@ -20,7 +20,6 @@ namespace Plugin {
         internal static string Language = "en-us";
         internal static SpeedMode CurrentSpeedMode = SpeedMode.Normal;
         internal static IndicatorLight DirectionLight = IndicatorLight.None;
-        internal static CrashState currentCrashState = CrashState.None;
         internal static int SpeedLimit = 60;
 
         /// <summary>Is called when the plugin is loaded.</summary>
@@ -44,6 +43,7 @@ namespace Plugin {
 
         /// <summary>Is called after loading to inform the plugin about the specifications of the train.</summary>
         public void SetVehicleSpecs(VehicleSpecs specs) {
+            DSDManager.Initialize(specs);
             Plugin.specs = specs;
         }
 
@@ -67,6 +67,9 @@ namespace Plugin {
             ReporterLED.Update(data);
             AIManager.Elapse(data);
             PAManager.Elapse(data);
+            CrashManager.Elapse(data);
+            ClampPowerNotch(data);
+            DSDManager.Elapse(data);
 
             /* Lock the door above 2 km/h */
             if (currentSpeed > 2 && Config.doorlockEnabled) {
@@ -107,44 +110,6 @@ namespace Plugin {
                 PanelManager.Set(PanelIndices.TutorialModeEng, 0);
             }
 
-            /* Clamp the power notch to P1 on slow mode. */
-            if (CurrentSpeedMode == SpeedMode.Slow && data.Handles.PowerNotch > 1) {
-                data.Handles.PowerNotch = 1;
-            } else if (CurrentSpeedMode != SpeedMode.Fast && data.Handles.PowerNotch == specs.PowerNotches) {
-                /* We reserved the last notch for the fast (aka "Elephant") mode. If the current speed mode is not fast and current power notch is the last notch: Clamp it to last notch - 1 */
-                data.Handles.PowerNotch = specs.PowerNotches - 1;
-            }
-
-            switch(currentCrashState) {
-                case CrashState.Medium:
-                    PanelManager.Set(PanelIndices.GlassCracked, 1);
-                    SetHeadlightState(data, 2);
-                    break;
-                case CrashState.Severe:
-                    PanelManager.Set(PanelIndices.GlassCracked, 1);
-                    PanelManager.Set(PanelIndices.NoPower, 1);
-                    DirectionLight = IndicatorLight.None;
-                    PanelManager.Set(PanelIndices.Indicator, 0);
-                    break;
-            }
-
-            // Handle collision with front train
-            if (data.PrecedingVehicle != null && Config.crashEnabled) {
-                if (currentCrashState == CrashState.None && data.PrecedingVehicle.Distance < 0.1 && data.PrecedingVehicle.Distance > -4) {
-                    /* Crash Sounds */
-                    SoundManager.Play(SoundIndices.Crash, 1.0, 1.0, false);
-                    double collisionSpeed = Math.Abs(data.PrecedingVehicle.Speed.KilometersPerHour - currentSpeed);
-
-                    if(collisionSpeed > 17) {
-                        currentCrashState = CrashState.Severe;
-                    } else if(collisionSpeed > 10) {
-                        currentCrashState = CrashState.Medium;
-                    } else {
-                        currentCrashState = CrashState.Minor;
-                    }
-                }
-            }
-
             if (StationManager.approachingStation && currentSpeed < 0.1 && DoorOpened2 == false) {
                 PanelManager.Set(PanelIndices.DoorLockBlink, 1);
                 /* If the reverser is Forward */
@@ -172,16 +137,22 @@ namespace Plugin {
                 SoundManager.Stop(SoundIndices.CabDirIndicator);
             }
 
+            // Brake Sound
+            if (LastBrakeNotch == 0 && data.Handles.BrakeNotch > 0 && currentSpeed > 15) {
+                SoundManager.PlayAllCar(SoundIndices.StartBrake, 1.0, 1.0, false);
+            }
+
+            LastBrakeNotch = data.Handles.BrakeNotch;
+
             PanelManager.Set(PanelIndices.TrainStatus, Config.trainStatus);
         }
 
-        private void SetHeadlightState(ElapseData data, int state) {
-            //HACK: Use reflection to call data.HeadlightState = 2
+        internal static void SetHeadlightState(ElapseData data, int state) {
+            //HACK: Use reflection to call data.HeadlightState = X
             //This is required or our plugin will throw an error in older OpenBVE Version
             //Because you know there will always be someone running this in older version despite being warned against so...
-            if (setHeadLightMethod != null)
-            {
-                setHeadLightMethod.Invoke(data, new object[] { 2 });
+            if (setHeadLightMethod != null) {
+                setHeadLightMethod.Invoke(data, new object[] { state });
             }
         }
 
@@ -195,15 +166,19 @@ namespace Plugin {
         }
 
         public void SetBrake(int notch) {
-            if (LastBrakeNotch == 0 && notch > 0 && currentSpeed > 15) {
-                SoundManager.PlayAllCar(SoundIndices.StartBrake, 1.0, 1.0, false);
-            }
-
             if (notch % 2 == 0 && CameraManager.InCab() && Ready) {
                 SoundManager.Play(SoundIndices.powerHandleClick, 1.0, 1.0, false);
             }
+        }
 
-            LastBrakeNotch = notch;
+        public void ClampPowerNotch(ElapseData data) {
+            /* Clamp the power notch to P1 on slow mode. */
+            if (CurrentSpeedMode == SpeedMode.Slow && data.Handles.PowerNotch > 1) {
+                data.Handles.PowerNotch = 1;
+            } else if (CurrentSpeedMode != SpeedMode.Fast && data.Handles.PowerNotch == specs.PowerNotches) {
+                /* We reserved the last notch for the fast (aka "Elephant") mode. If the current speed mode is not fast and current power notch is the last notch: Clamp it to last notch - 1 */
+                data.Handles.PowerNotch = specs.PowerNotches - 1;
+            }
         }
 
         /// <summary>Is called when a virtual key is pressed.</summary>
@@ -216,17 +191,16 @@ namespace Plugin {
                     ConfigForm.LaunchForm();
                     break;
                 case VirtualKeys.A1:
-                    ResetLRV(0);
+                    ResetLRV(ResetType.SecuritySystem);
                     break;
                 case VirtualKeys.A2:
-                    if (CameraManager.InCab()) SoundManager.Play(SoundIndices.Click, 1.0, 1.0, false);
+                    SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
 
                     if ((int)CurrentSpeedMode == 2) {
                         CurrentSpeedMode = SpeedMode.Normal;
                     } else {
                         CurrentSpeedMode++;
                     }
-
                     PanelManager.Set(PanelIndices.SpeedModeSwitch, (int)CurrentSpeedMode);
                     break;
                 case VirtualKeys.B1:
@@ -255,18 +229,21 @@ namespace Plugin {
                     break;
                 case VirtualKeys.L:
                     PanelManager.Toggle(PanelIndices.SpeedometerLight);
-                    SoundManager.PlayCabPanelClickSound();
+                    SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
+                    break;
+                case VirtualKeys.S:
+                    DSDManager.setDSDHeld(true);
                     break;
                 case VirtualKeys.J:
                     PanelManager.Toggle(PanelIndices.LightToggle);
-                    SoundManager.PlayCabPanelClickSound();
+                    SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
                     break;
                 case VirtualKeys.WiperSpeedUp:
-                    SoundManager.PlayCabPanelClickSound();
+                    SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
                     PanelManager.Increment(PanelIndices.WiperMode, Enum.GetNames(typeof(WiperMode)).Length - 1);
                     break;
                 case VirtualKeys.WiperSpeedDown:
-                    SoundManager.PlayCabPanelClickSound();
+                    SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
                     PanelManager.Decrement(PanelIndices.WiperMode, 0);
                     break;
                 case VirtualKeys.LeftDoors:
@@ -284,13 +261,18 @@ namespace Plugin {
                     ToggleDirectionIndicator(IndicatorLight.Both);
                     break;
                 case VirtualKeys.Headlights:
-                    SoundManager.PlayCabPanelClickSound();
+                    SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
                     break;
             }
         }
 
         /// <summary>Is called when a virtual key is released.</summary>
         public void KeyUp(VirtualKeys key) {
+            switch(key) {
+                case VirtualKeys.S:
+                    DSDManager.setDSDHeld(false);
+                    break;
+            }
         }
 
         public void HornBlow(HornTypes type) {
@@ -367,7 +349,7 @@ namespace Plugin {
                 PanelManager.Set(PanelIndices.Indicator, 0);
             }
 
-            SoundManager.PlayCabPanelClickSound();
+            SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
         }
 
         internal void ResetLRV(ResetType mode) {
@@ -375,20 +357,22 @@ namespace Plugin {
                 DoorOpened2 = true;
                 DoorBrake = true;
                 iSPSDoorLock = false;
-                if (currentCrashState != CrashState.None) {
-                    currentCrashState = CrashState.None;
-                    PanelManager.Set(PanelIndices.GlassCracked, 0);
-                    PanelManager.Set(PanelIndices.SpeedometerLight, 0);
-                    PanelManager.Set(PanelIndices.NoPower, 0);
+                if (CrashManager.TrainCrashed()) {
+                    CrashManager.SetCrashState(CrashState.None);
                 }
+
+                AIManager.ResetLRV(mode);
+                PanelManager.Set(202, 0);
+                PanelManager.Set(203, 0);
+                PanelManager.Set(PanelIndices.SpeedometerLight, 0);
+                PanelManager.Set(PanelIndices.NoPower, 0);
             }
 
-            AIManager.ResetLRV(mode);
-            StationManager.approachingStation = false;
-            iSPSDoorLock = false;
-            DoorBrake = false;
-            PanelManager.Set(202, 0);
-            PanelManager.Set(203, 0);
+            if(mode == ResetType.SecuritySystem) {
+                StationManager.approachingStation = false;
+                iSPSDoorLock = false;
+                DoorBrake = false;
+            }
         }
 
         internal static void ChangeCarNumber(int car, int states) {
@@ -402,7 +386,7 @@ namespace Plugin {
 
     public enum ResetType {
         JumpStation,
-        ManualReset,
+        SecuritySystem,
     }
 
     public enum IndicatorLight {
