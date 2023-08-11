@@ -55,7 +55,6 @@ namespace Plugin {
             MTRBeeping.Checked = Config.mtrBeeping;
             RevAtStation.Checked = Config.allowReversingInStations;
             TrainStatusBox.SelectedIndex = Config.trainStatus;
-            tutCheckBox.Checked = Config.tutorialMode;
             if (Plugin.LRVGeneration == Util.LRVType.P1 || Plugin.LRVGeneration == Util.LRVType.P1R) {
                 CarNum1Box.Minimum = 1001;
                 CarNum1Box.Maximum = 1090;
@@ -99,7 +98,6 @@ namespace Plugin {
             Config.crashEnabled = CrashCheckBox.Checked;
             Config.mtrBeeping = MTRBeeping.Checked;
             Config.allowReversingInStations = RevAtStation.Checked;
-            Config.tutorialMode = tutCheckBox.Checked;
             Plugin.ChangeCarNumber(1, Util.CarNumPanel((int) CarNum1Box.Value));
             Plugin.ChangeCarNumber(2, Util.CarNumPanel((int) CarNum2Box.Value));
             Config.WriteConfig("CarNum", CarNum1Box.Value + "," + CarNum2Box.Value);

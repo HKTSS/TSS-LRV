@@ -294,6 +294,7 @@ namespace Plugin {
             this.tutCheckBox.Text = "Tutorial Mode";
             this.tutCheckBox.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.tutCheckBox.UseVisualStyleBackColor = true;
+            this.tutCheckBox.Visible = false;
             // 
             // ConfigForm
             // 

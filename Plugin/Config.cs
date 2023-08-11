@@ -20,7 +20,6 @@ namespace Plugin {
 		internal static bool crashEnabled;
 		internal static bool mtrBeeping;
 		internal static bool allowReversingInStations;
-		internal static bool tutorialMode;
 		internal static int trainStatus;
 
 		internal static bool LoadConfig(LoadProperties prop, Util.LRVType LRVGen) {
@@ -84,10 +83,6 @@ namespace Plugin {
 								case "revatstation":
 									if (valstr == "true") allowReversingInStations = true;
 									else allowReversingInStations = false;
-									break;
-								case "tutorial":
-									if (valstr == "true") tutorialMode = true;
-									else tutorialMode = false;
 									break;
 								case "trainstatus":
 									if (int.TryParse(valstr, NumberStyles.Integer, CultureInfo.InvariantCulture, out val)) {
@@ -197,7 +192,6 @@ namespace Plugin {
 			sb.AppendLine("MTRbeep = false");
 			sb.AppendLine("RevAtStation = false");
 			sb.AppendLine("TrainStatus = 0");
-			sb.AppendLine("Tutorial = true");
 			try {
 				File.WriteAllText(configPath, sb.ToString());
 				return true;

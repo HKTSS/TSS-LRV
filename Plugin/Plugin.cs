@@ -2,7 +2,6 @@
 using OpenBveApi.Colors;
 using Plugin.Managers;
 using System;
-using OpenBveApi.Hosts;
 
 namespace Plugin {
     /// <summary>The interface to be implemented by the plugin.</summary>
@@ -100,17 +99,6 @@ namespace Plugin {
                 PanelManager.Set(PanelIndices.Indicator, 0);
             }
 
-            if (Config.tutorialMode) {
-                if (Language.StartsWith("zh")) {
-                    PanelManager.Set(PanelIndices.TutorialModeChin, 1);
-                } else {
-                    PanelManager.Set(PanelIndices.TutorialModeEng, 1);
-                }
-            } else {
-                PanelManager.Set(PanelIndices.TutorialModeChin, 0);
-                PanelManager.Set(PanelIndices.TutorialModeEng, 0);
-            }
-
             if (StationManager.approachingStation && currentSpeed < 0.1 && DoorOpened2 == false) {
                 PanelManager.Set(PanelIndices.DoorLockBlink, 1);
                 /* If the reverser is Forward */
@@ -183,16 +171,15 @@ namespace Plugin {
         }
 
         private void launchConfigPanel() {
-            if(Type.GetType("System.Windows.Forms") == null) {
-                // No Winform support, just launch the config file directly
-                // (Probably macOS)
+            if (System.IO.File.Exists(@"/System/Library/CoreServices/SystemVersion.plist")) {
+                // macOS no Winform support, just launch the config file directly
                 try {
                     System.Diagnostics.Process.Start(Config.configPath);
                 } catch (Exception) {
                     // I can't help you :(
                 }
             } else {
-                // Can use Winform, so let's use that
+                // Assume they can launch WinForm (Sorry), so let's use that
                 ConfigForm.LaunchForm();
             }
         }

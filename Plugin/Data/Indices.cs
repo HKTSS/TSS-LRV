@@ -13,9 +13,6 @@
         public const int WiperMode = 113;
         public const int TreadBrake = 114;
 
-        public const int TutorialModeEng = 121;
-        public const int TutorialModeChin = 122;
-
         public const int ReporterLEDSpecialState = 125;
         public const int ReporterLEDState = 126;
         public const int ReporterLEDTextureX = 127;
