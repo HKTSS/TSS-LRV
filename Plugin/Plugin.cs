@@ -2,6 +2,7 @@
 using OpenBveApi.Colors;
 using Plugin.Managers;
 using System;
+using OpenBveApi.Hosts;
 
 namespace Plugin {
     /// <summary>The interface to be implemented by the plugin.</summary>
@@ -181,6 +182,21 @@ namespace Plugin {
             }
         }
 
+        private void launchConfigPanel() {
+            if(Type.GetType("System.Windows.Forms") == null) {
+                // No Winform support, just launch the config file directly
+                // (Probably macOS)
+                try {
+                    System.Diagnostics.Process.Start(Config.configPath);
+                } catch (Exception) {
+                    // I can't help you :(
+                }
+            } else {
+                // Can use Winform, so let's use that
+                ConfigForm.LaunchForm();
+            }
+        }
+
         /// <summary>Is called when a virtual key is pressed.</summary>
         public void KeyDown(VirtualKeys key) {
             VirtualKeys virtualKey = key;
@@ -188,7 +204,7 @@ namespace Plugin {
             switch (virtualKey) {
                 /* GearDown = Ctrl + G */
                 case VirtualKeys.GearDown:
-                    ConfigForm.LaunchForm();
+                    launchConfigPanel();
                     break;
                 case VirtualKeys.A1:
                     ResetLRV(ResetType.SecuritySystem);

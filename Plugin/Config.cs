@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Plugin {
 	internal class Config {
-		private static string configFile;
+		internal static string configPath { get; private set; }
 		private static string reporterCustomMsgFile;
 		private static string[] lines;
 		private static string failureReason;
@@ -24,14 +24,14 @@ namespace Plugin {
 		internal static int trainStatus;
 
 		internal static bool LoadConfig(LoadProperties prop, Util.LRVType LRVGen) {
-			configFile = Path.Combine(prop.PluginFolder, "LRVSystem.ini");
+			configPath = Path.Combine(prop.PluginFolder, "config.txt");
 			reporterCustomMsgFile = Path.Combine(prop.PluginFolder, "SpecialMsgLED.ini");
 			LoadReporterMessage();
 			Messages.RegisterTranslations();
 			/* Get the Plugin Folder path, then combine it with LRVSystem.ini for the full path to the config file. */
-			if (File.Exists(configFile)) {
+			if (File.Exists(configPath)) {
 				try {
-					lines = File.ReadAllLines(configFile, Encoding.UTF8);
+					lines = File.ReadAllLines(configPath, Encoding.UTF8);
 				} catch {
 					prop.FailureReason = "\n[LRV-System] Failed to read configuration file, aborting plugin initalization!";
 					return false;
@@ -166,7 +166,7 @@ namespace Plugin {
 		internal static void WriteConfig(string targetKey, string targetValue) {
 			try {
 				int lineCount = 0;
-				string[] line = File.ReadAllLines(configFile);
+				string[] line = File.ReadAllLines(configPath);
 				foreach (string eachLine in line) {
 					string[] cfg = eachLine.Split('=');
 					string key = cfg[0].Trim().ToLowerInvariant();
@@ -175,7 +175,7 @@ namespace Plugin {
 					}
 					lineCount++;
 				}
-				File.WriteAllLines(configFile, lines);
+				File.WriteAllLines(configPath, lines);
 			} catch {
 				MessageManager.PrintMessage("Fail to save the configuration file!", OpenBveApi.Colors.MessageColor.Red, 5.0);
 			}
@@ -183,6 +183,12 @@ namespace Plugin {
 
 		internal static bool GenerateConfig() {
 			StringBuilder sb = new StringBuilder();
+            // Comment
+            sb.AppendLine("# 修改此檔案後，你需要重新載入OpenBVE才能令設定生效");
+            sb.AppendLine("# After editing this config, please restart OpenBVE to apply changes.");
+            sb.AppendLine("# true = 啟用/Enabled");
+            sb.AppendLine("# false = 停用/Disabled");
+            sb.AppendLine("");
 			sb.AppendLine("CarNum = 1127,1120");
 			sb.AppendLine("DoorLock = true");
 			sb.AppendLine("ApplyBrake = true");
@@ -193,7 +199,7 @@ namespace Plugin {
 			sb.AppendLine("TrainStatus = 0");
 			sb.AppendLine("Tutorial = true");
 			try {
-				File.WriteAllText(configFile, sb.ToString());
+				File.WriteAllText(configPath, sb.ToString());
 				return true;
 			} catch {
 				failureReason = "\n[LRV-System] Configuration file not found and failed to generate a config file.\n[LRV-System] Please check your permission.";

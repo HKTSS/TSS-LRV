@@ -14,7 +14,6 @@ namespace Plugin.Managers
 
         internal static void Elapse(ElapseData data) {
             if(!Config.dsdEnabled) {
-                System.Windows.Forms.MessageBox.Show("S");
                 dsdHeld = true;
             }
 
