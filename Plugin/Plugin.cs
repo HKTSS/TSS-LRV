@@ -64,7 +64,7 @@ namespace Plugin {
 
             CameraManager.Update(data);
             StationManager.Update(data);
-            ReporterLED.Update(data);
+            StopReporterManager.Elapse(data);
             AIManager.Elapse(data);
             PAManager.Elapse(data);
             CrashManager.Elapse(data);
@@ -185,8 +185,8 @@ namespace Plugin {
         }
 
         /// <summary>Is called when a virtual key is pressed.</summary>
-        public void KeyDown(VirtualKeys key) {
-            VirtualKeys virtualKey = key;
+        public void KeyDown(VirtualKeys virtualKey) {
+            DSDManager.KeyDown(virtualKey);
 
             switch (virtualKey) {
                 /* GearDown = Ctrl + G */
@@ -234,9 +234,6 @@ namespace Plugin {
                     PanelManager.Toggle(PanelIndices.SpeedometerLight);
                     SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
                     break;
-                case VirtualKeys.S:
-                    DSDManager.setDSDHeld(true);
-                    break;
                 case VirtualKeys.J:
                     PanelManager.Toggle(PanelIndices.LightToggle);
                     SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
@@ -270,12 +267,8 @@ namespace Plugin {
         }
 
         /// <summary>Is called when a virtual key is released.</summary>
-        public void KeyUp(VirtualKeys key) {
-            switch(key) {
-                case VirtualKeys.S:
-                    DSDManager.setDSDHeld(false);
-                    break;
-            }
+        public void KeyUp(VirtualKeys virtualKey) {
+            DSDManager.KeyUp(virtualKey);
         }
 
         public void HornBlow(HornTypes type) {

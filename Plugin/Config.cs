@@ -96,7 +96,7 @@ namespace Plugin {
 
                 return true;
 			} else {
-				/* If GenerateConfig doesn't return false, that means we have generated a config file without any error. Now we can apply the changes instantly in-game */
+				/* We have generated a config file without any error. Now we can apply the changes instantly in-game */
 				if (GenerateConfig()) {
 					carNum1 = 1127;
 					carNum2 = 1120;
@@ -125,7 +125,7 @@ namespace Plugin {
 					string ln = lines[i];
 
 					if (ln.ToLowerInvariant().Equals("[end]")) {
-						ReporterLED.SpecialMessages.Add(currentMessage);
+						StopReporterManager.SpecialMessages.Add(currentMessage);
 						continue;
 					}
 
@@ -139,16 +139,16 @@ namespace Plugin {
 						string val = ln.Split('=')[1].Trim();
 						switch (key) {
 							case "duration":
-								currentMessage.duration = int.Parse(val);
+								currentMessage.Duration = int.Parse(val);
 								break;
 							case "states":
-								currentMessage.states = int.Parse(val);
+								currentMessage.State = int.Parse(val);
 								break;
 							case "maxY":
-								currentMessage.maxY = int.Parse(val);
+								currentMessage.MaxY = int.Parse(val);
 								break;
 							case "incrementY":
-								currentMessage.incrementY = int.Parse(val);
+								currentMessage.IncrementY = int.Parse(val);
 								break;
 							default:
 								break;

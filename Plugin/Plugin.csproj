@@ -49,7 +49,6 @@
     <Compile Include="Data\ReporterMessage.cs" />
     <Compile Include="Managers\PAManager.cs" />
     <Compile Include="Translations.cs" />
-    <Compile Include="ReporterLED.cs" />
     <Compile Include="Managers\SoundManager.cs" />
     <Compile Include="Managers\StationManager.cs" />
     <Compile Include="Forms\ConfigForm.cs">
@@ -61,16 +60,19 @@
     <Compile Include="Config.cs" />
     <Compile Include="Managers\MessageManager.cs" />
     <Compile Include="Data\Indices.cs" />
-    <Compile Include="Plugin.cs" />
-    <Compile Include="Plugin.Sound.cs">
-      <DependentUpon>Plugin.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Managers\AIManager.cs" />
     <Compile Include="Managers\PanelManager.cs" />
     <Compile Include="Managers\DSDManager.cs" />
     <Compile Include="Managers\CrashManager.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="Plugin.Sound.cs">
+      <DependentUpon>Plugin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Managers\StopReporterManager.cs" />
+    <Compile Include="Managers\StopReporterSpecialMessage.cs" />
+    <Compile Include="Managers\StopReporterTextureShift.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenBveApi">

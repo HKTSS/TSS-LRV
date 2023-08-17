@@ -13,10 +13,10 @@
         public const int WiperMode = 113;
         public const int TreadBrake = 114;
 
-        public const int ReporterLEDSpecialState = 125;
-        public const int ReporterLEDState = 126;
-        public const int ReporterLEDTextureX = 127;
-        public const int ReporterLEDTextureY = 128;
+        public const int StopReporterSpecialState = 125;
+        public const int StopReporterLangState = 126;
+        public const int StopReporterTextureX = 127;
+        public const int StopReporterTextureY = 128;
 
         public const int DestinationLEDOverride = 130;
         public const int TrainStatus = 131;

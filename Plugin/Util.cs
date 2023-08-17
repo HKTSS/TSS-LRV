@@ -1,5 +1,6 @@
-﻿namespace Plugin {
-	static class Util {
+﻿using System;
+namespace Plugin {
+	internal static class Util {
 		internal static int CarNumPanel(int carNum) {
 			/* The plugin states is just Car No. - 1110 */
 			/* Example: 1118 - 1110 = 8 */
@@ -39,5 +40,9 @@
 			}
 			return 1001;
 		}
-	}
+
+        internal static double ClampNumber(int min, double value, int max) {
+            return Math.Max(0, Math.Min(1, value));
+        }
+    }
 }

@@ -31,13 +31,29 @@ namespace Plugin.Managers
         }
 
         internal static void setDSDHeld(bool newDSDHeld) {
-            if(newDSDHeld != dsdHeld) {
+            if(Config.dsdEnabled) {
                 // Click sound
-                SoundManager.Play(SoundIndices.powerHandleClick, 1.0, 1.0, false);
-            }
-
-            if (Config.dsdEnabled) {
+                if (newDSDHeld != dsdHeld) {
+                    SoundManager.Play(SoundIndices.powerHandleClick, 1.0, 1.0, false);
+                }
                 dsdHeld = newDSDHeld;
+            } else {
+                dsdHeld = true;
+            }
+        }
+
+        internal static void KeyDown(VirtualKeys key) { 
+            // Space
+            if(key == VirtualKeys.S) {
+                setDSDHeld(true);
+            }
+        }
+
+        internal static void KeyUp(VirtualKeys key)
+        {
+            // Space
+            if (key == VirtualKeys.S) {
+                setDSDHeld(false);
             }
         }
     }
