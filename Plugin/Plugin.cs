@@ -240,7 +240,7 @@ namespace Plugin {
                     break;
                 case VirtualKeys.WiperSpeedUp:
                     SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
-                    PanelManager.Increment(PanelIndices.WiperMode, Enum.GetNames(typeof(WiperMode)).Length - 1);
+                    PanelManager.Increment(PanelIndices.WiperMode, Enum.GetNames(typeof(WiperMode)).Length);
                     break;
                 case VirtualKeys.WiperSpeedDown:
                     SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
@@ -399,9 +399,10 @@ namespace Plugin {
     }
 
     public enum WiperMode { 
-        Stopped,
-        Normal,
-        Fast
+        I,
+        II,
+        III,
+        IV
     }
 
     public enum CrashState {
