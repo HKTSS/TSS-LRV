@@ -8,7 +8,7 @@ namespace Plugin.Managers {
         private static int LangState;
         private static bool ReporterHidden;
 
-		internal static void Elapse(ElapseData data) {
+        internal static void Elapse(ElapseData data) {
 			ElapsedTime += data.ElapsedTime.Seconds;
             UpdateState(data);
             UpdateTextureShift(data);
@@ -46,7 +46,8 @@ namespace Plugin.Managers {
             }
 
             // Passed 100m from last station, resets the reporter
-            if (!StationManager.doorOpenedInStation && data.Vehicle.Location - StationManager.prevStation.StopPosition > 100 && ReporterHidden) {
+            double prevStnDistance = data.Vehicle.Location - StationManager.prevStation.StopPosition;
+            if (prevStnDistance > 100 && ReporterHidden) {
                 ResetReporter();
             }
 

@@ -4,21 +4,39 @@ namespace Plugin.Managers {
 	internal static class StationManager {
 		private static int stationIndex;
 		private static double lastFramePosition;
-		internal static Station nextStation;
-		internal static Station prevStation;
-		internal static bool approachingStation = true;
+		internal static Station nextStation { get; private set; }
+		internal static Station prevStation { get; private set; }
+        private static Station nextStationInternal;
+        private static Station prevStationInternal;
+        internal static bool approachingStation = true;
+        internal static bool offsetToNextStation;
 		internal static bool doorOpenedInStation;
 
 		internal static void Update(ElapseData data) {
 			while (stationIndex < data.Stations.Count - 1 && data.Stations[stationIndex].StopPosition + 5 < data.Vehicle.Location) stationIndex++;
 			while (stationIndex > 1 && data.Stations[stationIndex - 1].StopPosition > data.Vehicle.Location) stationIndex--;
-            nextStation = data.Stations[stationIndex];
-			prevStation = data.Stations[stationIndex - 1 < 0 ? 0 : stationIndex - 1];
 
-			if (Plugin.DoorOpened && data.Vehicle.Location >= nextStation.DefaultTrackPosition) {
+            int offset = 0;
+
+            bool trainApproachedStation = nextStationInternal != null && data.Vehicle.Location >= nextStationInternal.DefaultTrackPosition;
+            bool trainWithinStation = nextStationInternal != null && (trainApproachedStation && data.Vehicle.Location < nextStationInternal.StopPosition + 5);
+
+            if (offsetToNextStation) offset++;
+
+            nextStation = data.Stations[stationIndex + offset];
+			prevStation = data.Stations[(stationIndex + offset) - 1 < 0 ? 0 : (stationIndex + offset) - 1];
+            nextStationInternal = data.Stations[stationIndex];
+            prevStationInternal = data.Stations[stationIndex - 1 < 0 ? 0 : stationIndex - 1];
+
+            if (!trainWithinStation) {
+                offsetToNextStation = false;
+            }
+
+            if (Plugin.DoorOpened && trainApproachedStation) {
+                offsetToNextStation = true;
 				doorOpenedInStation = true;
-			} else {
-				doorOpenedInStation = false;
+            } else {
+                doorOpenedInStation = false;
 			}
 
 			/* If last frame the train has not yet reached the start of the station
