@@ -70,9 +70,11 @@
     <Compile Include="Plugin.Sound.cs">
       <DependentUpon>Plugin.cs</DependentUpon>
     </Compile>
-    <Compile Include="Managers\StopReporterManager.cs" />
-    <Compile Include="Managers\StopReporterSpecialMessage.cs" />
-    <Compile Include="Managers\StopReporterTextureShift.cs" />
+    <Compile Include="Managers\StopReporter.Manager.cs" />
+    <Compile Include="Managers\StopReporter.SpecialMessage.cs" />
+    <Compile Include="Managers\StopReporter.TextureShift.cs" />
+    <Compile Include="Data\StationHacksEntry.cs" />
+    <Compile Include="Managers\StopReporter.Hacks.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OpenBveApi">

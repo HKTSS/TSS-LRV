@@ -3,11 +3,13 @@ using OpenBveApi.Runtime;
 using Plugin.Managers;
 using System.Globalization;
 using System.Text;
+using System.Xml;
 
 namespace Plugin {
 	internal class Config {
 		internal static string configPath { get; private set; }
 		private static string reporterCustomMsgFile;
+        private static string reporterHacksFile;
 		private static string[] lines;
 		private static string failureReason;
 		internal static int carNum1 = 1127;
@@ -25,7 +27,9 @@ namespace Plugin {
 		internal static bool LoadConfig(LoadProperties prop, Util.LRVType LRVGen) {
 			configPath = Path.Combine(prop.PluginFolder, "config.txt");
 			reporterCustomMsgFile = Path.Combine(prop.PluginFolder, "SpecialMsgLED.ini");
-			LoadReporterMessage();
+            reporterHacksFile = Path.Combine(prop.PluginFolder, "stopreporter_hacks.xml");
+            LoadReporterMessage();
+            LoadStopReporterHacks();
 			Messages.RegisterTranslations();
 			/* Get the Plugin Folder path, then combine it with LRVSystem.ini for the full path to the config file. */
 			if (File.Exists(configPath)) {
@@ -158,7 +162,20 @@ namespace Plugin {
 			}
 		}
 
-		internal static void WriteConfig(string targetKey, string targetValue) {
+        private static void LoadStopReporterHacks() { 
+            if(File.Exists(reporterHacksFile)) {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(reporterHacksFile);
+
+                XmlNodeList stations = xmlDoc.GetElementsByTagName("Station");
+                foreach (XmlNode stationNode in stations) {
+                    Data.StationHacksEntry stationHacksEntry = new Data.StationHacksEntry(stationNode);
+                    StopReporterManager.StationHacksEntries.Add(stationHacksEntry);
+                }
+            }
+        }
+
+        internal static void WriteConfig(string targetKey, string targetValue) {
 			try {
 				int lineCount = 0;
 				string[] line = File.ReadAllLines(configPath);

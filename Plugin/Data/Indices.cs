@@ -6,9 +6,9 @@
         public const int Digit1 = 105;
         public const int Digit2 = 106;
         public const int Digit3 = 107;
-        public const int LightToggle = 99;
+        public const int InteriorLightToggle = 99;
         public const int SpeedometerLight = 110;
-        public const int CabDoor = 111;
+        public const int CabDoorToggle = 111;
         public const int SpeedModeSwitch = 112;
         public const int WiperMode = 113;
         public const int TreadBrake = 114;
@@ -17,8 +17,8 @@
         public const int StopReporterLangState = 126;
         public const int StopReporterTextureX = 127;
         public const int StopReporterTextureY = 128;
+        public const int StopReporterStationHacks = 129;
 
-        public const int DestinationLEDOverride = 130;
         public const int TrainStatus = 131;
         public const int iSPSOverSpeed = 201;
         public const int DoorLockBlink = 202;
@@ -28,6 +28,7 @@
         public const int GlassCracked = 212;
         public const int NoPower = 213;
     }
+
     public class SoundIndices {
 	    public const int CabPanelSwitch = 221;
         public const int CabDirIndicator = 222;

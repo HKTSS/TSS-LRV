@@ -6,7 +6,7 @@ namespace Plugin.Managers {
 		private static double lastFramePosition;
 		internal static Station nextStation { get; private set; }
 		internal static Station prevStation { get; private set; }
-        private static Station nextStationInternal;
+        internal static Station nextStationInternal;
         private static Station prevStationInternal;
         internal static bool approachingStation = true;
         internal static bool offsetToNextStation;
@@ -23,10 +23,11 @@ namespace Plugin.Managers {
 
             if (offsetToNextStation) offset++;
 
-            nextStation = data.Stations[stationIndex + offset];
-			prevStation = data.Stations[(stationIndex + offset) - 1 < 0 ? 0 : (stationIndex + offset) - 1];
-            nextStationInternal = data.Stations[stationIndex];
-            prevStationInternal = data.Stations[stationIndex - 1 < 0 ? 0 : stationIndex - 1];
+            nextStation = Util.GetClampedListItem(data.Stations, stationIndex + offset);
+            prevStation = Util.GetClampedListItem(data.Stations, (stationIndex + offset) - 1);
+
+            nextStationInternal = Util.GetClampedListItem(data.Stations, stationIndex);
+            prevStationInternal = Util.GetClampedListItem(data.Stations, stationIndex - 1);
 
             if (!trainWithinStation) {
                 offsetToNextStation = false;

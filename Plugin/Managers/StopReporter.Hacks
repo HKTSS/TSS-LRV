@@ -1,7 +1,7 @@
 ﻿using OpenBveApi.Runtime;
 
 namespace Plugin.Managers {
-	internal partial class StopReporterManager {
+    internal partial class StopReporterManager {
         private static readonly double LangSwitchTime = 8;
         private static double ElapsedTime;
         private static int LastLangState;
@@ -9,7 +9,7 @@ namespace Plugin.Managers {
         private static bool ReporterHidden;
 
         internal static void Elapse(ElapseData data) {
-			ElapsedTime += data.ElapsedTime.Seconds;
+            ElapsedTime += data.ElapsedTime.Seconds;
             UpdateState(data);
             UpdateTextureShift(data);
 

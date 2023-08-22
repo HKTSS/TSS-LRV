@@ -228,14 +228,14 @@ namespace Plugin {
                     PanelManager.Increment(PanelIndices.Digit3);
                     break;
                 case VirtualKeys.K:
-                    PanelManager.Toggle(PanelIndices.CabDoor);
+                    PanelManager.Toggle(PanelIndices.CabDoorToggle);
                     break;
                 case VirtualKeys.L:
                     PanelManager.Toggle(PanelIndices.SpeedometerLight);
                     SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
                     break;
                 case VirtualKeys.J:
-                    PanelManager.Toggle(PanelIndices.LightToggle);
+                    PanelManager.Toggle(PanelIndices.InteriorLightToggle);
                     SoundManager.PlayCabSound(SoundIndices.CabPanelSwitch);
                     break;
                 case VirtualKeys.WiperSpeedUp:

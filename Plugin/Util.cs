@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace Plugin {
 	internal static class Util {
 		internal static int CarNumPanel(int carNum) {
@@ -43,6 +44,17 @@ namespace Plugin {
 
         internal static double ClampNumber(int min, double value, int max) {
             return Math.Max(0, Math.Min(1, value));
+        }
+
+        internal static T GetClampedListItem<T>(List<T> la, int index) {
+            if (index <= 0) {
+                return la[0];
+            }
+            if(index > la.Count-1) {
+                return la[la.Count-1];
+            } else {
+                return la[index];
+            }
         }
     }
 }
