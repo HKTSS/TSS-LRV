@@ -18,7 +18,7 @@ namespace Plugin.Data
                         int.TryParse(nodes.InnerText, out destination);
                         break;
                     case "keyword":
-                        keywords.Add(nodes.InnerText.ToLowerInvariant());
+                        keywords.Add(nodes.InnerText);
                         break;
                 }
             }
