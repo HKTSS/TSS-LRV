@@ -8,7 +8,7 @@ using System.Xml;
 namespace Plugin {
 	internal class Config {
 		internal static string configPath { get; private set; }
-		private static string reporterCustomMsgFile;
+		private static string SpecialReporterMessageFile;
         private static string reporterHacksFile;
 		private static string[] lines;
 		private static string failureReason;
@@ -26,9 +26,9 @@ namespace Plugin {
 
 		internal static bool LoadConfig(LoadProperties prop, Util.LRVType LRVGen) {
 			configPath = Path.Combine(prop.PluginFolder, "config.txt");
-			reporterCustomMsgFile = Path.Combine(prop.PluginFolder, "SpecialMsgLED.ini");
+			SpecialReporterMessageFile = Path.Combine(prop.PluginFolder, "stopreporter_special_msg.xml");
             reporterHacksFile = Path.Combine(prop.PluginFolder, "stopreporter_hacks.xml");
-            LoadReporterMessage();
+            LoadReporterSpecialMessage();
             LoadStopReporterHacks();
 			Messages.RegisterTranslations();
 			/* Get the Plugin Folder path, then combine it with LRVSystem.ini for the full path to the config file. */
@@ -118,47 +118,16 @@ namespace Plugin {
 			}
 		}
 
-		private static void LoadReporterMessage() {
-			string[] lines;
-			Data.ReporterMessage currentMessage = null;
+		private static void LoadReporterSpecialMessage() {
+			if (File.Exists(SpecialReporterMessageFile)) {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(SpecialReporterMessageFile);
 
-			if (File.Exists(reporterCustomMsgFile)) {
-				lines = File.ReadAllLines(reporterCustomMsgFile);
-
-				for (int i = 0; i < lines.Length; i++) {
-					string ln = lines[i];
-
-					if (ln.ToLowerInvariant().Equals("[end]")) {
-						StopReporterManager.SpecialMessages.Add(currentMessage);
-						continue;
-					}
-
-					if (ln.ToLowerInvariant().Equals("[start]")) {
-						currentMessage = new Data.ReporterMessage();
-					} else {
-						if(currentMessage == null) currentMessage = new Data.ReporterMessage();
-
-						if (ln.Split('=').Length < 2) continue;
-						string key = ln.Split('=')[0].Trim();
-						string val = ln.Split('=')[1].Trim();
-						switch (key) {
-							case "duration":
-								currentMessage.Duration = int.Parse(val);
-								break;
-							case "states":
-								currentMessage.State = int.Parse(val);
-								break;
-							case "maxY":
-								currentMessage.MaxY = int.Parse(val);
-								break;
-							case "incrementY":
-								currentMessage.IncrementY = int.Parse(val);
-								break;
-							default:
-								break;
-						}
-					}
-				}
+                XmlNodeList entries = xmlDoc.GetElementsByTagName("Entry");
+                foreach (XmlNode messageNode in entries) {
+                    Data.ReporterMessage reporterMessage = new Data.ReporterMessage(messageNode);
+                    StopReporterManager.SpecialMessages.Add(reporterMessage);
+                }
 			}
 		}
 

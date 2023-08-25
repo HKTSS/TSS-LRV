@@ -39,6 +39,11 @@ namespace Plugin.Managers {
             if (LastLangState != LangState) {
                 if(LangState == 3) {
                     SetRandomSpecialMessage();
+                    TextureShiftY = 0;
+                    CappedY = 0;
+                }
+                if(LangState == 1) {
+                    CurrentSpecialMessage = null;
                 }
 
                 if (StationManager.doorOpenedInStation) {
@@ -57,6 +62,7 @@ namespace Plugin.Managers {
 
         private static void ResetReporter() {
             ReporterHidden = false;
+            CurrentSpecialMessage = null;
             ResetReporterAnimation();
         }
 
@@ -64,6 +70,7 @@ namespace Plugin.Managers {
             ElapsedTime = 0;
             TextureShiftX = 0;
             TextureShiftY = 0;
+            CappedY = 0;
             LangState = 1;
         }
     }

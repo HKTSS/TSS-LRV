@@ -23,7 +23,11 @@ namespace Plugin.Managers
         }
 
         private static void SetRandomSpecialMessage() {
-            CurrentSpecialMessage = SpecialMessages[rnd.Next(SpecialMessages.Count - 1)];
+            if(!ReporterHidden) {
+                CurrentSpecialMessage = SpecialMessages[rnd.Next(SpecialMessages.Count)];
+            } else {
+                CurrentSpecialMessage = null;
+            }
         }
     }
 }

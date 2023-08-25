@@ -70,7 +70,7 @@
     <Compile Include="Plugin.Sound.cs">
       <DependentUpon>Plugin.cs</DependentUpon>
     </Compile>
-    <Compile Include="Managers\StopReporter.Manager.cs" />
+    <Compile Include="Managers\StopReporter.cs" />
     <Compile Include="Managers\StopReporter.SpecialMessage.cs" />
     <Compile Include="Managers\StopReporter.TextureShift.cs" />
     <Compile Include="Data\StationHacksEntry.cs" />
