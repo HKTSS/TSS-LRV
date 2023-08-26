@@ -272,6 +272,15 @@ namespace Plugin {
         }
 
         public void HornBlow(HornTypes type) {
+            switch(type) { 
+                case HornTypes.Music:
+                    if(Config.mtrBeeping) {
+                        SoundManager.PlayAllCar(SoundIndices.PAMTRDoorClose, 1.0, 1.0, false);
+                    } else {
+                        SoundManager.PlayAllCar(SoundIndices.PAHoldHandrail, 1.0, 1.0, false);
+                    }
+                    break;
+            }
         }
 
         /// <summary>Is called when the state of the doors changes.</summary>

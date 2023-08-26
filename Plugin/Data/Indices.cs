@@ -36,6 +36,8 @@
         public const int MTRBeep = 224;
         public const int StartBrake = 225;
         public const int powerHandleClick = 226;
+        public const int PAMTRDoorClose = 227;
+        public const int PAHoldHandrail = 228;
     }
 
     public class BeaconIndices {
