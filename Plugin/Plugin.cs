@@ -171,15 +171,16 @@ namespace Plugin {
         }
 
         private void launchConfigPanel() {
-            if (System.IO.File.Exists(@"/System/Library/CoreServices/SystemVersion.plist")) {
-                // macOS no Winform support, just launch the config file directly
+            if (System.IO.File.Exists(@"/System/Library/CoreServices/SystemVersion.plist") && IntPtr.Size != 4) {
+                // macOS 64bit no Winform support, just launch the config file directly
                 try {
                     System.Diagnostics.Process.Start(Config.configPath);
                 } catch (Exception) {
                     // I can't help you :(
+                    MessageManager.PrintMessage("Unable to launch the Config Form due to an error.", MessageColor.Red, 5.0);
                 }
             } else {
-                // Assume they can launch WinForm (Sorry), so let's use that
+                // Assume they can launch WinForm, so let's use that
                 ConfigForm.LaunchForm();
             }
         }
