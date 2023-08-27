@@ -88,7 +88,35 @@ namespace Plugin {
 									if (valstr == "true") allowReversingInStations = true;
 									else allowReversingInStations = false;
 									break;
-								case "trainstatus":
+                                case "lrvgeneration":
+                                    switch(valstr) {
+                                        case "1":
+                                            Plugin.LRVGeneration = Util.LRVType.P1;
+                                            break;
+                                        case "1r":
+                                            Plugin.LRVGeneration = Util.LRVType.P1R;
+                                            break;
+                                        case "2":
+                                            Plugin.LRVGeneration = Util.LRVType.P2;
+                                            break;
+                                        case "3":
+                                            Plugin.LRVGeneration = Util.LRVType.P3;
+                                            break;
+                                        case "4":
+                                            Plugin.LRVGeneration = Util.LRVType.P4;
+                                            break;
+                                        case "5":
+                                            Plugin.LRVGeneration = Util.LRVType.P5;
+                                            break;
+                                        case "6":
+                                            Plugin.LRVGeneration = Util.LRVType.P6;
+                                            break;
+                                        case "7":
+                                            Plugin.LRVGeneration = Util.LRVType.P7;
+                                            break;
+                                    }
+                                    break;
+                                case "trainstatus":
 									if (int.TryParse(valstr, NumberStyles.Integer, CultureInfo.InvariantCulture, out val)) {
 										if (val <= 3) trainStatus = val;
 									}
@@ -150,8 +178,8 @@ namespace Plugin {
 				string[] line = File.ReadAllLines(configPath);
 				foreach (string eachLine in line) {
 					string[] cfg = eachLine.Split('=');
-					string key = cfg[0].Trim().ToLowerInvariant();
-					if (key == targetKey.ToLowerInvariant()) {
+					string key = cfg[0].Trim();
+					if (key.ToLowerInvariant() == targetKey.ToLowerInvariant()) {
 						lines[lineCount] = key + " = " + targetValue;
 					}
 					lineCount++;
@@ -177,8 +205,10 @@ namespace Plugin {
 			sb.AppendLine("Crash = true");
 			sb.AppendLine("MTRbeep = false");
 			sb.AppendLine("RevAtStation = false");
-			sb.AppendLine("TrainStatus = 0");
-			try {
+            sb.AppendLine("DSD = false");
+            sb.AppendLine("TrainStatus = 0");
+            sb.AppendLine("LRVGeneration = 4");
+            try {
 				File.WriteAllText(configPath, sb.ToString());
 				return true;
 			} catch {

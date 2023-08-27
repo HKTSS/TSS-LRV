@@ -21,7 +21,7 @@ namespace Plugin {
             ChineseTranslations.Add("configForm.SafetySysLabel", "安全系統");
             ChineseTranslations.Add("configForm.OtherLabel", "其他");
             ChineseTranslations.Add("configForm.CarNum1Label", "第一卡:");
-            ChineseTranslations.Add("configForm.CarNum2Label", "第二卡 (如有):");
+            ChineseTranslations.Add("configForm.CarNum2Label", "第二卡:");
             ChineseTranslations.Add("configForm.DoorLockLabel", "列車未停定的情況下，鎖住車門");
             ChineseTranslations.Add("configForm.DoorApplyBrakeLabel", "車門開啟時，鎖住牽引動力");
             ChineseTranslations.Add("configForm.iSPSDoorLockLabel", "駛入月台後，如車門未開啟時，抑制牽引動力");
@@ -50,7 +50,7 @@ namespace Plugin {
             EnglishTranslations.Add("configForm.SafetySysLabel", "Safety Systems");
             EnglishTranslations.Add("configForm.OtherLabel", "Misc");
             EnglishTranslations.Add("configForm.CarNum1Label", "1st Car:");
-            EnglishTranslations.Add("configForm.CarNum2Label", "2nd Car (If any):");
+            EnglishTranslations.Add("configForm.CarNum2Label", "2nd Car:");
             EnglishTranslations.Add("configForm.DoorLockLabel", "Lock all doors when the train departs");
             EnglishTranslations.Add("configForm.DoorApplyBrakeLabel", "Apply brake when the door is opened");
             EnglishTranslations.Add("configForm.iSPSDoorLockLabel", "Apply brake until driver opens the door after approaching a station");

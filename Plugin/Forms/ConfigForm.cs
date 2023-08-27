@@ -109,7 +109,6 @@ namespace Plugin {
 			Config.WriteConfig("MTRbeep", MTRBeeping.Checked.ToString().ToLowerInvariant());
             Config.WriteConfig("RevAtStation", RevAtStation.Checked.ToString().ToLowerInvariant());
             Config.WriteConfig("TrainStatus", TrainStatusBox.SelectedIndex.ToString());
-            Config.WriteConfig("Tutorial", tutCheckBox.Checked.ToString().ToLowerInvariant());
             this.Close();
         }
     }

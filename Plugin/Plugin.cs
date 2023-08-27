@@ -6,7 +6,7 @@ using System;
 namespace Plugin {
     /// <summary>The interface to be implemented by the plugin.</summary>
     public partial class Plugin : IRuntime {
-        private double currentSpeed;
+        private double CurrentSpeed;
         private bool iSPSDoorLock;
         private bool DoorBrake;
         private bool Ready;
@@ -15,7 +15,6 @@ namespace Plugin {
         internal static bool DoorOpened2 = true;
         internal static Util.LRVType LRVGeneration = Util.LRVType.P4;
         internal static int LastBrakeNotch = 5;
-        internal static bool LockTreadBrake;
         internal static VehicleSpecs specs;
         internal static string Language = "en-us";
         internal static SpeedMode CurrentSpeedMode = SpeedMode.Normal;
@@ -60,7 +59,7 @@ namespace Plugin {
             /* Get system language, used for displaying train settings dialog later. */
             Ready = true;
             Language = data.CurrentLanguageCode;
-            currentSpeed = data.Vehicle.Speed.KilometersPerHour;
+            CurrentSpeed = data.Vehicle.Speed.KilometersPerHour;
 
             CameraManager.Update(data);
             StationManager.Update(data);
@@ -72,13 +71,13 @@ namespace Plugin {
             DSDManager.Elapse(data);
 
             /* Lock the door above 2 km/h */
-            if (currentSpeed > 2 && Config.doorlockEnabled) {
+            if (CurrentSpeed > 2 && Config.doorlockEnabled) {
                 data.DoorInterlockState = DoorInterlockStates.Locked;
             } else {
                 data.DoorInterlockState = DoorInterlockStates.Unlocked;
             }
 
-            if (currentSpeed > SpeedLimit - 5) {
+            if (CurrentSpeed > SpeedLimit - 5) {
                 PanelManager.Set(PanelIndices.iSPSOverSpeed, 1);
             } else {
                 PanelManager.Set(PanelIndices.iSPSOverSpeed, 0);
@@ -99,7 +98,7 @@ namespace Plugin {
                 PanelManager.Set(PanelIndices.Indicator, 0);
             }
 
-            if (StationManager.approachingStation && currentSpeed < 0.1 && DoorOpened2 == false) {
+            if (StationManager.approachingStation && CurrentSpeed < 0.1 && DoorOpened2 == false) {
                 PanelManager.Set(PanelIndices.DoorLockBlink, 1);
                 /* If the reverser is Forward */
                 if (data.Handles.Reverser == 1) {
@@ -111,7 +110,7 @@ namespace Plugin {
                 }
             }
 
-            if (currentSpeed > 10 && PanelManager.Get(PanelIndices.DoorLockBlink) == 1) {
+            if (CurrentSpeed > 10 && PanelManager.Get(PanelIndices.DoorLockBlink) == 1) {
                 PanelManager.Set(PanelIndices.DoorLockBlink, 0);
             }
 
@@ -127,7 +126,7 @@ namespace Plugin {
             }
 
             // Brake Sound
-            if (LastBrakeNotch == 0 && data.Handles.BrakeNotch > 0 && currentSpeed > 15) {
+            if (LastBrakeNotch == 0 && data.Handles.BrakeNotch > 0 && CurrentSpeed > 15) {
                 SoundManager.PlayAllCar(SoundIndices.StartBrake, 1.0, 1.0, false);
             }
 
@@ -170,7 +169,7 @@ namespace Plugin {
             }
         }
 
-        private void launchConfigPanel() {
+        private void LaunchConfigEditor() {
             if (System.IO.File.Exists(@"/System/Library/CoreServices/SystemVersion.plist") && IntPtr.Size != 4) {
                 // macOS 64bit no Winform support, just launch the config file directly
                 try {
@@ -192,7 +191,7 @@ namespace Plugin {
             switch (virtualKey) {
                 /* GearDown = Ctrl + G */
                 case VirtualKeys.GearDown:
-                    launchConfigPanel();
+                    LaunchConfigEditor();
                     break;
                 case VirtualKeys.A1:
                     ResetLRV(ResetType.SecuritySystem);
